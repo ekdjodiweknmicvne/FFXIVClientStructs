@@ -13,11 +13,8 @@ namespace FFXIVClientStructs.FFXIV.Client.Game.Character;
 // ctor E8 ?? ?? ?? ?? 48 8B C8 48 8B 43 08 45 33 C9
 [StructLayout(LayoutKind.Explicit, Size = 0x1BD0)]
 [VTableAddress("48 8D 05 ?? ?? ?? ?? 48 8B D9 48 89 01 48 8D 05 ?? ?? ?? ?? 48 89 81 ?? ?? ?? ?? 48 81 C1 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 8B ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 8B ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 35", 3)]
+[Inheritance<GameObject>, Inheritance<CharacterData>(0x1A0)]
 public unsafe partial struct Character {
-    [FieldOffset(0x0)] public GameObject GameObject;
-
-    [FieldOffset(0x1A0)] public CharacterData CharacterData;
-
     [FieldOffset(0x210)] public fixed byte Movement[0x420];
     [FieldOffset(0x630)] public EmoteController EmoteController;
 
@@ -87,13 +84,13 @@ public unsafe partial struct Character {
     // 0x20 = GPose wetness toggled
 
     public bool IsWeaponDrawn => (StatusFlags3 & 0x1) == 0x1;
-    public bool IsOffhandDrawn => (CharacterData.Flags1 & 0x40) == 0x40;
-    public bool InCombat => (CharacterData.Flags1 & 0x20) == 0x20;
-    public bool IsHostile => (CharacterData.Flags1 & 0x10) == 0x10;
+    public bool IsOffhandDrawn => (Flags1 & 0x40) == 0x40;
+    public bool InCombat => (Flags1 & 0x20) == 0x20;
+    public bool IsHostile => (Flags1 & 0x10) == 0x10;
     public bool IsCasting => GetCastInfo() != null && (GetCastInfo()->IsCasting & 0x1) == 0x1;
-    public bool IsPartyMember => (CharacterData.Flags2 & 0x8) == 0x8;
-    public bool IsAllianceMember => (CharacterData.Flags2 & 0x10) == 0x10;
-    public bool IsFriend => (CharacterData.Flags2 & 0x20) == 0x20;
+    public bool IsPartyMember => (Flags2 & 0x8) == 0x8;
+    public bool IsAllianceMember => (Flags2 & 0x10) == 0x10;
+    public bool IsFriend => (Flags2 & 0x20) == 0x20;
 
     public bool IsGPoseWet {
         get => (StatusFlags4 & 0x01) == 0x01;

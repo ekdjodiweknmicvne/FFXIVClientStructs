@@ -8,4 +8,9 @@ internal static class SymbolExtensions {
         return symbol.GetAttributes()
             .FirstOrDefault(attributeData => attributeData.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGenericsOptions(SymbolDisplayGenericsOptions.None)) == "global::" + typeName);
     }
+
+    public static Seq<AttributeData> GetAttributeDatasByTypeName(this ISymbol symbol, string typeName) {
+        return symbol.GetAttributes()
+            .Where(attributeData => attributeData.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithGenericsOptions(SymbolDisplayGenericsOptions.None)) == "global::" + typeName).ToSeq();
+    }
 }
