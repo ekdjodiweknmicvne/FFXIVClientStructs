@@ -50,15 +50,17 @@ internal sealed class InheritanceGenerator : IIncrementalGenerator {
             });
     }
 
-    internal sealed record InheritanceInfo(StructInfo StructInfo, string TypeName, int Offset, Seq<FieldInfoWithOffset> FieldInfos) {
+    internal sealed record InheritanceInfo(StructInfo StructInfo, string TypeName, int Offset, Seq<FieldInfoWithOffset> FieldInfos, Seq<FuncInfo> FuncInfos) {
         public static Seq<Validation<DiagnosticInfo, InheritanceInfo>> GetFromRoslyn(StructDeclarationSyntax structSyntax, INamedTypeSymbol namedTypeSymbol) {
             Validation<DiagnosticInfo, StructInfo> validStructInfo = StructInfo.GetFromSyntax(structSyntax);
 
             var inheritances = namedTypeSymbol.GetAttributeDatasByTypeName(InheritanceAttributeName.Replace("`1", "")).Select(attribute => {
                 Option<AttributeData> optAttr = attribute;
-                var offset = optAttr.GetValidAttributeArgument<int>("Offset", 0, InheritanceAttributeName, namedTypeSymbol);
+                var offset = optAttr.GetValidAttributeArgument<int>("offset", 0, InheritanceAttributeName, namedTypeSymbol);
                 var structType = attribute.AttributeClass!.TypeArguments.First();
-                var members = structType.GetMembers().Where(t => t is IFieldSymbol).Cast<IFieldSymbol>().Select(FieldInfoWithOffset.GetFromRoslyn).ToSeq();
+                var members = structType.GetMembers();
+                var methods = members.Where(t => t is IMethodSymbol).Cast<IMethodSymbol>().Select(FuncInfo.GetFromRoslyn).ToSeq();
+                var fields = members.Where(t => t is IFieldSymbol).Cast<IFieldSymbol>().Select(FieldInfoWithOffset.GetFromRoslyn).ToSeq();
                 var structTypeName = optAttr
                     .Bind<string>(attrData => attrData.AttributeClass!.TypeArguments.First().GetFullyQualifiedNameWithGenerics())
                     .ToValidation(
@@ -66,12 +68,12 @@ internal sealed class InheritanceGenerator : IIncrementalGenerator {
                             AttributeGenericTypeArgumentInvalid,
                             namedTypeSymbol,
                             InheritanceAttributeName));
-                return (offset, structTypeName, members.Traverse(fiwo => fiwo));
+                return (offset, structTypeName, fields.Traverse(fiwo => fiwo), methods.Traverse(vfi => vfi));
             });
 
             return inheritances.Select(inheritance => {
-                var (offsetVal, structType, fiwo) = inheritance;
-                return (validStructInfo, structType, offsetVal, fiwo).Apply((structInfo, typeName, offset, fiwo) => new InheritanceInfo(structInfo, typeName, offset, fiwo));
+                var (offsetVal, structType, fiwo, vfi) = inheritance;
+                return (validStructInfo, structType, offsetVal, fiwo, vfi).Apply((structInfo, typeName, offset, fiwo, vfi) => new InheritanceInfo(structInfo, typeName, offset, fiwo, vfi));
             });
         }
 
@@ -84,6 +86,11 @@ internal sealed class InheritanceGenerator : IIncrementalGenerator {
             FieldInfos.Iter(fiwo => {
                 fiwo.RenderSource(builder, Offset);
             });
+
+            // This does not work in the current state of Source Generators because its not compiled yet and thus not in the assembly for Roslyn to find for other Source Generators
+            // FuncInfos.Iter(vfi => {
+            //     vfi.RenderSource(builder);
+            // });
 
             StructInfo.RenderEnd(builder);
 
@@ -104,14 +111,14 @@ internal sealed class InheritanceGenerator : IIncrementalGenerator {
     }
 
     internal sealed record FieldInfoWithOffset(string Name, string TypeName, int Offset) {
-        public static Validation<DiagnosticInfo, FieldInfoWithOffset> GetFromRoslyn(IFieldSymbol fieldSymbols) {
-            Validation<DiagnosticInfo, IFieldSymbol> validSymbol = Validation<DiagnosticInfo, IFieldSymbol>.Success(fieldSymbols);
+        public static Validation<DiagnosticInfo, FieldInfoWithOffset> GetFromRoslyn(IFieldSymbol fieldSymbol) {
+            Validation<DiagnosticInfo, IFieldSymbol> validSymbol = Validation<DiagnosticInfo, IFieldSymbol>.Success(fieldSymbol);
 
-            Validation<DiagnosticInfo, string> validType = Validation<DiagnosticInfo, string>.Success(fieldSymbols.Type.GetFullyQualifiedNameWithGenerics());
+            Validation<DiagnosticInfo, string> validType = Validation<DiagnosticInfo, string>.Success(fieldSymbol.Type.GetFullyQualifiedNameWithGenerics());
 
-            Option<AttributeData> offsetOpt = fieldSymbols.GetAttributes().FirstOrDefault(attr => attr.AttributeClass?.Name == "FieldOffsetAttribute");
+            Option<AttributeData> offsetOpt = fieldSymbol.GetAttributes().FirstOrDefault(attr => attr.AttributeClass?.Name == "FieldOffsetAttribute");
 
-            Validation<DiagnosticInfo, int> validOffset = offsetOpt.GetValidAttributeArgument<int>("offset", 0, "System.Runtime.InteropServices.FieldOffset", fieldSymbols);
+            Validation<DiagnosticInfo, int> validOffset = offsetOpt.GetValidAttributeArgument<int>("offset", 0, "System.Runtime.InteropServices.FieldOffset", fieldSymbol);
 
             return (validSymbol, validType, validOffset).Apply((symbol, type, offset) =>
                                new FieldInfoWithOffset(symbol.Name, type, offset));
@@ -119,6 +126,40 @@ internal sealed class InheritanceGenerator : IIncrementalGenerator {
 
         public void RenderSource(IndentedStringBuilder builder, int offset) {
             builder.AppendLine($"[FieldOffset(0x{(offset + Offset):X})] public {TypeName} {Name};");
+        }
+    }
+
+    internal sealed record FuncInfo(string Name, string TypeName, object? Val, bool VFunc) {
+        public static Validation<DiagnosticInfo, FuncInfo> GetFromRoslyn(IMethodSymbol methodSymbol) {
+            Validation<DiagnosticInfo, IMethodSymbol> validSymbol = Validation<DiagnosticInfo, IMethodSymbol>.Success(methodSymbol);
+
+            Validation<DiagnosticInfo, string> validType = Validation<DiagnosticInfo, string>.Success(methodSymbol.ReturnType.GetFullyQualifiedNameWithGenerics());
+
+            Option<AttributeData> attrData = methodSymbol.GetFirstAttributeDataByTypeName("FFXIVClientStructs.Interop.Attributes.VirtualFunctionAttribute");
+
+            if (attrData.IsNone) {
+                attrData = methodSymbol.GetFirstAttributeDataByTypeName("FFXIVClientStructs.Interop.Attributes.MemberFunctionAttribute");
+                if (attrData.IsNone) {
+                    return (validSymbol, validType).Apply((symbol, type) =>
+                        new FuncInfo(symbol.Name, type, null, false));
+                }
+                Validation<DiagnosticInfo, string> validSig = attrData.GetValidAttributeArgument<string>("signature", 0, "FFXIVClientStructs.Interop.Attributes.MemberFunctionAttribute", methodSymbol);
+
+                return (validSymbol, validType, validSig).Apply((symbol, type, sig) =>
+                    new FuncInfo(symbol.Name, type, sig, false));
+            } else {
+                Validation<DiagnosticInfo, uint> validOffset = attrData.GetValidAttributeArgument<uint>("index", 0, "FFXIVClientStructs.Interop.Attributes.VirtualFunctionAttribute", methodSymbol);
+
+                return (validSymbol, validType, validOffset).Apply((symbol, type, offset) =>
+                    new FuncInfo(symbol.Name, type, offset, true));
+            }
+
+        }
+
+        public void RenderSource(IndentedStringBuilder builder) {
+            if (Val is null)
+                return;
+            builder.AppendLine($"[{(VFunc ? $"VirtualFunction({Val})" : $"MemberFunction(\"{Val}\")")}] public partial {TypeName} {Name}();");
         }
     }
 }
