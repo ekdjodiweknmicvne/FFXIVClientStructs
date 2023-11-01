@@ -84,7 +84,7 @@ internal sealed class InheritanceGenerator : IIncrementalGenerator {
             StructInfo.RenderStart(builder);
 
             FieldInfos.Iter(fiwo => {
-                fiwo.RenderSource(builder, Offset);
+                fiwo.RenderSource(builder, Offset, StructInfo.Name);
             });
 
             // This does not work in the current state of Source Generators because its not compiled yet and thus not in the assembly for Roslyn to find for other Source Generators
@@ -124,8 +124,8 @@ internal sealed class InheritanceGenerator : IIncrementalGenerator {
                                new FieldInfoWithOffset(symbol.Name, type, offset));
         }
 
-        public void RenderSource(IndentedStringBuilder builder, int offset) {
-            builder.AppendLine($"[FieldOffset(0x{(offset + Offset):X})] public {TypeName} {Name};");
+        public void RenderSource(IndentedStringBuilder builder, int offset, string structName) {
+            builder.AppendLine($"[FieldOffset(0x{(offset + Offset):X})] public {TypeName} {(Name != structName ? Name : TypeName.Split('.')[^1])};");
         }
     }
 
