@@ -32,10 +32,11 @@ internal sealed class InheritanceGenerator : IIncrementalGenerator {
                     });
 
         IncrementalValuesProvider<Validation<DiagnosticInfo, StructWithInheritanceInfos>> structWithInheritanceInfos =
-            structAndInheritanceInfos.Select(static (item, _) => {
+            structAndInheritanceInfos.Select((item, _) => {
                 var (structInfo, inheritanceInfos) = item;
-                return (structInfo, inheritanceInfos.Traverse(info => info)).Apply(static (si, ii) =>
-                    new StructWithInheritanceInfos(si, ii));
+                return (structInfo, inheritanceInfos.Traverse(info => info)).Apply((si, ii) => {
+                    return new StructWithInheritanceInfos(si, ii);
+                });
             });
 
         context.RegisterSourceOutput(structWithInheritanceInfos,
@@ -50,30 +51,60 @@ internal sealed class InheritanceGenerator : IIncrementalGenerator {
             });
     }
 
-    internal sealed record InheritanceInfo(StructInfo StructInfo, string TypeName, int Offset, Seq<FieldInfoWithOffset> FieldInfos, Seq<FuncInfo> FuncInfos) {
+    internal sealed record InheritanceInfo(StructInfo StructInfo, string TypeName, int Offset, Seq<FieldInfoWithOffset> FieldInfos, Seq<FuncInfo> FuncInfos, Seq<InheritanceInfo> SubInheritances) {
+        private sealed record ProcessingInheritneceInfo(Validation<DiagnosticInfo, int> Offset, Validation<DiagnosticInfo, string> StructName, Validation<DiagnosticInfo, Seq<FieldInfoWithOffset>> Fields, Validation<DiagnosticInfo, Seq<FuncInfo>> Funcs, Validation<DiagnosticInfo, Seq<InheritanceInfo>> SubInheritances);
         public static Seq<Validation<DiagnosticInfo, InheritanceInfo>> GetFromRoslyn(StructDeclarationSyntax structSyntax, INamedTypeSymbol namedTypeSymbol) {
             Validation<DiagnosticInfo, StructInfo> validStructInfo = StructInfo.GetFromSyntax(structSyntax);
 
-            var inheritances = namedTypeSymbol.GetAttributeDatasByTypeName(InheritanceAttributeName.Replace("`1", "")).Select(attribute => {
+            Seq<ProcessingInheritneceInfo> inheritances = GetInheritance(structSyntax, namedTypeSymbol);
+
+            return inheritances.Select(inheritance => {
+                var (offsetVal, structType, fiwo, vfi, inheritances) = inheritance;
+                return (validStructInfo, structType, offsetVal, fiwo, vfi, inheritances).Apply((structInfo, typeName, offset, fiwo, vfi, inheritances) => new InheritanceInfo(structInfo, typeName, offset, fiwo, vfi, inheritances));
+            });
+        }
+
+        private static Seq<ProcessingInheritneceInfo> GetInheritance(StructDeclarationSyntax structSyntax, INamedTypeSymbol namedTypeSymbol) {
+            Validation<DiagnosticInfo, StructInfo> validStructInfo = StructInfo.GetFromSyntax(structSyntax);
+
+            return namedTypeSymbol.GetAttributeDatasByTypeName(InheritanceAttributeName.Replace("`1", "")).Select(attribute => {
                 Option<AttributeData> optAttr = attribute;
-                var offset = optAttr.GetValidAttributeArgument<int>("offset", 0, InheritanceAttributeName, namedTypeSymbol);
-                var structType = attribute.AttributeClass!.TypeArguments.First();
-                var members = structType.GetMembers();
-                var methods = members.Where(t => t is IMethodSymbol).Cast<IMethodSymbol>().Select(FuncInfo.GetFromRoslyn).ToSeq();
-                var fields = members.Where(t => t is IFieldSymbol).Cast<IFieldSymbol>().Select(FieldInfoWithOffset.GetFromRoslyn).ToSeq();
-                var structTypeName = optAttr
+                Validation<DiagnosticInfo, int> offset = optAttr.GetValidAttributeArgument<int>("offset", 0, InheritanceAttributeName, namedTypeSymbol);
+                INamedTypeSymbol structType = (INamedTypeSymbol)attribute.AttributeClass!.TypeArguments.First();
+                Seq<ProcessingInheritneceInfo> subInheritances = GetInheritance(structSyntax, structType);
+                ImmutableArray<ISymbol> members = structType.GetMembers();
+                Seq<Validation<DiagnosticInfo, FuncInfo>> methods = members.Where(t => t is IMethodSymbol).Cast<IMethodSymbol>().Select(FuncInfo.GetFromRoslyn).ToSeq();
+                Seq<Validation<DiagnosticInfo, FieldInfoWithOffset>> fields = members.Where(t => t is IFieldSymbol).Cast<IFieldSymbol>().Select(FieldInfoWithOffset.GetFromRoslyn).ToSeq();
+                Validation<DiagnosticInfo, string> structTypeName = optAttr
                     .Bind<string>(attrData => attrData.AttributeClass!.TypeArguments.First().GetFullyQualifiedNameWithGenerics())
                     .ToValidation(
                         DiagnosticInfo.Create(
                             AttributeGenericTypeArgumentInvalid,
                             namedTypeSymbol,
                             InheritanceAttributeName));
-                return (offset, structTypeName, fields.Traverse(fiwo => fiwo), methods.Traverse(vfi => vfi));
-            });
+                if (subInheritances.IsEmpty)
+                    return new ProcessingInheritneceInfo(offset, structTypeName, fields.Traverse(fiwo => fiwo), methods.Traverse(vfi => vfi), Validation<DiagnosticInfo, Seq<InheritanceInfo>>.Success(Seq<InheritanceInfo>.Empty));
 
-            return inheritances.Select(inheritance => {
-                var (offsetVal, structType, fiwo, vfi) = inheritance;
-                return (validStructInfo, structType, offsetVal, fiwo, vfi).Apply((structInfo, typeName, offset, fiwo, vfi) => new InheritanceInfo(structInfo, typeName, offset, fiwo, vfi));
+                Validation<DiagnosticInfo, Seq<(string structName, Seq<FieldInfoWithOffset>, Seq<FuncInfo> funcs, Seq<InheritanceInfo> subInheritances)>> k = subInheritances.Select(tuple => {
+                    var (subOffset, structName, subFields, subFuncs, subInheritances) = tuple;
+                    return (subOffset, offset, structName, subFields, subFuncs, subInheritances).Apply((subOffset, offset, structName, fields, funcs, subInheritances) => {
+                        return (structName, fields.Select(t => t with {
+                            Offset = t.Offset + offset + subOffset
+                        }), funcs, subInheritances);
+                    });
+                }).Traverse(t => t);
+                if (k.IsFail)
+                    return new ProcessingInheritneceInfo(offset, structTypeName, fields.Traverse(fiwo => fiwo), methods.Traverse(vfi => vfi), Validation<DiagnosticInfo, Seq<InheritanceInfo>>.Success(Seq<InheritanceInfo>.Empty));
+
+                Seq<InheritanceInfo> inheritances;
+                Seq<(string, Seq<FieldInfoWithOffset>, Seq<FuncInfo>, Seq<InheritanceInfo>)> inheritancesUnprocessed = (Seq<(string, Seq<FieldInfoWithOffset>, Seq<FuncInfo>, Seq<InheritanceInfo>)>)k.Case;
+                inheritancesUnprocessed.Iter(t => {
+                    var (structName, fields, funcs, subInheritances) = t;
+                    Validation<DiagnosticInfo, InheritanceInfo> f = (validStructInfo, offset).Apply((structInfo, offset) => new InheritanceInfo(structInfo, structName, offset, fields, funcs, subInheritances));
+                    if(f.IsSuccess)
+                        inheritances = inheritances.Add((InheritanceInfo)f.Case);
+                });
+                return new ProcessingInheritneceInfo(offset, structTypeName, fields.Traverse(fiwo => fiwo), methods.Traverse(vfi => vfi), Validation<DiagnosticInfo, Seq<InheritanceInfo>>.Success(inheritances));
             });
         }
 
@@ -106,6 +137,14 @@ internal sealed class InheritanceGenerator : IIncrementalGenerator {
         public void AddSource(SourceProductionContext sourceContext) {
             InheritanceInfos.Iter(info => {
                 sourceContext.AddSource(info.GetFileName(), info.RenderSource());
+                AddSubSource(sourceContext, info);
+            });
+        }
+
+        private void AddSubSource(SourceProductionContext sourceContext, InheritanceInfo info) {
+            info.SubInheritances.Iter(subInfo => {
+                sourceContext.AddSource(subInfo.GetFileName(), subInfo.RenderSource());
+                AddSubSource(sourceContext, subInfo);
             });
         }
     }

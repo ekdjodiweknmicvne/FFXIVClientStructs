@@ -18,7 +18,6 @@ public unsafe partial struct Character {
     [FieldOffset(0x210)] public fixed byte Movement[0x420];
     [FieldOffset(0x630)] public EmoteController EmoteController;
 
-
     [FieldOffset(0x670)] public MountContainer Mount;
     [FieldOffset(0x6D8)] public CompanionContainer Companion;
 
