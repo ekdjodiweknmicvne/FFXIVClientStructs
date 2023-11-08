@@ -4,9 +4,8 @@ namespace FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 // E9 ?? ?? ?? ?? 3D ?? ?? ?? ?? 0F 87 ?? ?? ?? ?? 3D ?? ?? ?? ?? 0F 83 ?? ?? ?? ?? 05 ?? ?? ?? ?? 83 F8 05
 // has id >63000 in InstanceContent sheet
 [StructLayout(LayoutKind.Explicit, Size = 0x1CA8 + 0x650)]
-public struct InstanceContentOceanFishing {
-    [FieldOffset(0x0)] public InstanceContentDirector InstanceContentDirector;
-
+[Inheritance<InstanceContentDirector>]
+public partial struct InstanceContentOceanFishing {
     // Row ID for IKDRoute sheet
     // Each zone (and their time of day) can be extracted from sheet
     [FieldOffset(0x1CD0)] public uint CurrentRoute;

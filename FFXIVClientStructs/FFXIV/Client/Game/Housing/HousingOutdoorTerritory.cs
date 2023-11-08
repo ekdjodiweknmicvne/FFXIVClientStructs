@@ -1,9 +1,8 @@
 namespace FFXIVClientStructs.FFXIV.Client.Game.Housing;
 
 [StructLayout(LayoutKind.Explicit, Size = 0xAE30)]
+[Inheritance<HousingTerritory>]
 public unsafe partial struct HousingOutdoorTerritory {
-    [FieldOffset(0x00)] public HousingTerritory HousingTerritory;
-
     /// <summary>
     /// Get the Icon ID used for map icons in housing areas.
     /// </summary>

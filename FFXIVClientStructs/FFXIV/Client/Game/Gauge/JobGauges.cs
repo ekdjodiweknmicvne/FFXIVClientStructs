@@ -1,21 +1,24 @@
 namespace FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 
 [StructLayout(LayoutKind.Explicit, Size = 0x08)]
-public struct JobGauge {
+public unsafe struct JobGauge {
+    [FieldOffset(0x0)] public void* VTable;
     // empty base class for other gauges, this only has the vtable
 }
 
 #region Healer
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct WhiteMageGauge {
+[Inheritance<JobGauge>]
+public partial struct WhiteMageGauge {
     [FieldOffset(0x0A)] public short LilyTimer;
     [FieldOffset(0x0C)] public byte Lily;
     [FieldOffset(0x0D)] public byte BloodLily;
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct ScholarGauge {
+[Inheritance<JobGauge>]
+public partial struct ScholarGauge {
     [FieldOffset(0x08)] public byte Aetherflow;
     [FieldOffset(0x09)] public byte FairyGauge;
     [FieldOffset(0x0A)] public short SeraphTimer;
@@ -23,7 +26,8 @@ public struct ScholarGauge {
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public unsafe struct AstrologianGauge {
+[Inheritance<JobGauge>]
+public partial struct AstrologianGauge {
     [FieldOffset(0x08)] public short Timer;
     [FieldOffset(0x0D)] public byte Card;
     [FieldOffset(0x0E)] public byte Seals; // 6 bits, 0,1-3,1-3,1-3 depending on astrosign
@@ -39,7 +43,8 @@ public unsafe struct AstrologianGauge {
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct SageGauge {
+[Inheritance<JobGauge>]
+public partial struct SageGauge {
     [FieldOffset(0x08)] public short AddersgallTimer;
     [FieldOffset(0x0A)] public byte Addersgall;
     [FieldOffset(0x0B)] public byte Addersting;
@@ -53,7 +58,8 @@ public struct SageGauge {
 #region MagicDPS
 
 [StructLayout(LayoutKind.Explicit, Size = 0x30)]
-public struct BlackMageGauge {
+[Inheritance<JobGauge>]
+public partial struct BlackMageGauge {
     [FieldOffset(0x08)] public short EnochianTimer;
     [FieldOffset(0x0A)] public short ElementTimeRemaining;
     [FieldOffset(0x0C)] public sbyte ElementStance;
@@ -68,7 +74,8 @@ public struct BlackMageGauge {
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct SummonerGauge {
+[Inheritance<JobGauge>]
+public partial struct SummonerGauge {
     [FieldOffset(0x8)] public ushort SummonTimer; // millis counting down
     [FieldOffset(0xA)] public ushort AttunementTimer; // millis counting down
     [FieldOffset(0xC)] public byte ReturnSummon; // Pet sheet (23=Carbuncle, the only option now)
@@ -78,7 +85,8 @@ public struct SummonerGauge {
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x50)]
-public struct RedMageGauge {
+[Inheritance<JobGauge>]
+public partial struct RedMageGauge {
     [FieldOffset(0x08)] public byte WhiteMana;
     [FieldOffset(0x09)] public byte BlackMana;
     [FieldOffset(0x0A)] public byte ManaStacks;
@@ -89,7 +97,8 @@ public struct RedMageGauge {
 #region RangeDPS
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct BardGauge {
+[Inheritance<JobGauge>]
+public partial struct BardGauge {
     [FieldOffset(0x08)] public ushort SongTimer;
     [FieldOffset(0x0C)] public byte Repertoire;
     [FieldOffset(0x0D)] public byte SoulVoice;
@@ -97,7 +106,8 @@ public struct BardGauge {
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct MachinistGauge {
+[Inheritance<JobGauge>]
+public partial struct MachinistGauge {
     [FieldOffset(0x08)] public short OverheatTimeRemaining;
     [FieldOffset(0x0A)] public short SummonTimeRemaining;
     [FieldOffset(0x0C)] public byte Heat;
@@ -107,7 +117,8 @@ public struct MachinistGauge {
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public unsafe struct DancerGauge {
+[Inheritance<JobGauge>]
+public unsafe partial struct DancerGauge {
     [FieldOffset(0x08)] public byte Feathers;
     [FieldOffset(0x09)] public byte Esprit;
     [FieldOffset(0x0A)] public fixed byte DanceSteps[4];
@@ -121,7 +132,8 @@ public unsafe struct DancerGauge {
 #region MeleeDPS
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct MonkGauge {
+[Inheritance<JobGauge>]
+public partial struct MonkGauge {
     [FieldOffset(0x08)] public byte Chakra; // Chakra count
 
     [FieldOffset(0x09)]
@@ -140,7 +152,8 @@ public struct MonkGauge {
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct DragoonGauge {
+[Inheritance<JobGauge>]
+public partial struct DragoonGauge {
     [FieldOffset(0x08)] public short LotdTimer;
     [FieldOffset(0x0A)] public byte LotdState; // This seems to only ever be 0 or 2 now
     [FieldOffset(0x0B)] public byte EyeCount;
@@ -148,14 +161,16 @@ public struct DragoonGauge {
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct NinjaGauge {
+[Inheritance<JobGauge>]
+public partial struct NinjaGauge {
     [FieldOffset(0x08)] public ushort HutonTimer;
     [FieldOffset(0x0A)] public byte Ninki;
     [FieldOffset(0x0B)] public byte HutonManualCasts;
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct SamuraiGauge {
+[Inheritance<JobGauge>]
+public partial struct SamuraiGauge {
     [FieldOffset(0x0A)] public KaeshiAction Kaeshi;
     [FieldOffset(0x0B)] public byte Kenki;
     [FieldOffset(0x0C)] public byte MeditationStacks;
@@ -163,7 +178,8 @@ public struct SamuraiGauge {
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct ReaperGauge {
+[Inheritance<JobGauge>]
+public partial struct ReaperGauge {
     [FieldOffset(0x08)] public byte Soul;
     [FieldOffset(0x09)] public byte Shroud;
     [FieldOffset(0x0A)] public ushort EnshroudedTimeRemaining;
@@ -176,7 +192,8 @@ public struct ReaperGauge {
 #region Tanks
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct DarkKnightGauge {
+[Inheritance<JobGauge>]
+public partial struct DarkKnightGauge {
     [FieldOffset(0x08)] public byte Blood;
     [FieldOffset(0x0A)] public ushort DarksideTimer;
     [FieldOffset(0x0C)] public byte DarkArtsState;
@@ -184,17 +201,20 @@ public struct DarkKnightGauge {
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct PaladinGauge {
+[Inheritance<JobGauge>]
+public partial struct PaladinGauge {
     [FieldOffset(0x08)] public byte OathGauge;
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct WarriorGauge {
+[Inheritance<JobGauge>]
+public partial struct WarriorGauge {
     [FieldOffset(0x08)] public byte BeastGauge;
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct GunbreakerGauge {
+[Inheritance<JobGauge>]
+public partial struct GunbreakerGauge {
     [FieldOffset(0x08)] public byte Ammo;
     [FieldOffset(0x0A)] public short MaxTimerDuration;
     [FieldOffset(0x0C)] public byte AmmoComboStep;

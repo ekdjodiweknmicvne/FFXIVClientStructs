@@ -49,7 +49,7 @@ public unsafe partial struct TargetSystem {
     public partial GameObject* GetMouseOverObject(int x, int y, GameObjectArray* objectArray, Camera* camera);
 
     public GameObject* GetMouseOverObject(int x, int y) {
-        var camera = Control.Instance()->CameraManager.Camera;
+        var camera = Control.Instance()->Camera;
         var localPlayer = Control.Instance()->LocalPlayer;
         if (camera == null || localPlayer == null || ObjectFilterArray1.Length <= 0)
             return null;

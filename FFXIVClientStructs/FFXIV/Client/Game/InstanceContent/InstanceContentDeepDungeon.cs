@@ -1,9 +1,8 @@
 namespace FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 
 [StructLayout(LayoutKind.Explicit, Size = 0x27D8)]
+[Inheritance<InstanceContentDirector>]
 public unsafe partial struct InstanceContentDeepDungeon {
-    [FieldOffset(0x00)] public InstanceContentDirector InstanceContentDirector;
-
     [FixedSizeArray<DeepDungeonPartyInfo>(4)]
     [FieldOffset(0x1D48)] public fixed byte Party[0x08 * 4];
     [FixedSizeArray<DeepDungeonItemInfo>(16)]

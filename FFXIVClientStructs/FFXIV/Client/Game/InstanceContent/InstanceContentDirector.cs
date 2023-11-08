@@ -1,8 +1,8 @@
 namespace FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 
 [StructLayout(LayoutKind.Explicit, Size = 0x1CB0)]
-public unsafe struct InstanceContentDirector {
-    [FieldOffset(0x00)] public ContentDirector ContentDirector;
+[Inheritance<ContentDirector>]
+public unsafe partial struct InstanceContentDirector {
     //[FieldOffset(0x730)] public fixed byte InstanceContentExcelRow[0xA8];
     /// <summary>
     /// The remaining time in seconds for the instance.
