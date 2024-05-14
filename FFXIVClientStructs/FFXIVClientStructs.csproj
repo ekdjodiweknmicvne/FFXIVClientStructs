@@ -1,23 +1,46 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <LangVersion>preview</LangVersion>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <OutputPath>..\bin\$(Configuration)\</OutputPath>
-        <DebugType>full</DebugType>
-        <DebugSymbols>true</DebugSymbols>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>CS1591</NoWarn>
-        <!--
-          <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-          <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
-          -->
-    </PropertyGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\FFXIVClientStructs.InteropSourceGenerators\FFXIVClientStructs.InteropSourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <NoWarn>CS1591;IDE0251;IDE0044</NoWarn>
+
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!-- the VersionGenerator handles those -->
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+
+    <OutputPath>..\bin\$(Configuration)\</OutputPath>
+
+    <Company>FFXIVClientStructs</Company>
+    <Product>FFXIVClientStructs</Product>
+    <AssemblyTitle>FFXIVClientStructs</AssemblyTitle>
+
+    <!--
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+    -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FFXIVClientStructs.InteropSourceGenerators\FFXIVClientStructs.InteropSourceGenerators.csproj">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.DisableRuntimeMarshallingAttribute" />
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>CExporter</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

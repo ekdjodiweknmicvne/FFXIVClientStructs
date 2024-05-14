@@ -12,25 +12,23 @@ public unsafe partial struct Utf8String : ICreatable, IDisposable {
     [FieldOffset(0x8)] public long BufSize; // default buffer = 0x40
     [FieldOffset(0x10)] public long BufUsed;
     [FieldOffset(0x18)] public long StringLength; // string length not including null terminator
-    [FieldOffset(0x20)] public byte IsEmpty;
-    [FieldOffset(0x21)] public byte IsUsingInlineBuffer;
+    [FieldOffset(0x20)] public bool IsEmpty;
+    [FieldOffset(0x21)] public bool IsUsingInlineBuffer;
     [FieldOffset(0x22)] public fixed byte InlineBuffer[0x40]; // inline buffer used until strlen > 0x40
 
-    public readonly int Length => Math.Max(0, (int)(BufUsed - 1));
-    [Obsolete("Use AsSpan() instead")]
-    public readonly ReadOnlySpan<byte> Span => new(StringPtr, Length);
-
-    public readonly ref readonly byte this[int index] => ref AsSpan()[index];
+    public int Length => Math.Max(0, (int)(BufUsed - 1));
+    
+    public ref readonly byte this[int index] => ref AsSpan()[index];
 
     public Utf8String() => Ctor();
     public Utf8String(byte* str) : this() => SetString(str);
     public Utf8String(string str) : this() => SetString(str);
     public Utf8String(ReadOnlySpan<byte> str) : this() => SetString(str);
 
-    public readonly ReadOnlySpan<byte> AsSpan() => new(StringPtr, Length);
+    public ReadOnlySpan<byte> AsSpan() => new(StringPtr, Length);
 
-    public readonly ReadOnlySpan<byte> Slice(int start) => AsSpan().Slice(start);
-    public readonly ReadOnlySpan<byte> Slice(int start, int length) => AsSpan().Slice(start, length);
+    public ReadOnlySpan<byte> Slice(int start) => AsSpan().Slice(start);
+    public ReadOnlySpan<byte> Slice(int start, int length) => AsSpan().Slice(start, length);
 
     public static Utf8String* CreateEmpty(IMemorySpace* memorySpace = null) {
         if (memorySpace == null) memorySpace = IMemorySpace.GetDefaultSpace();
@@ -152,6 +150,5 @@ public unsafe partial struct Utf8String : ICreatable, IDisposable {
     [MemberFunction("E8 ?? ?? ?? ?? 40 0F B6 C7 48 8D 35")]
     public static partial Utf8String* Concat(Utf8String* str, Utf8String* buffer, Utf8String* other);
 
-    public static implicit operator ReadOnlySpan<byte>(in Utf8String value)
-        => value.AsSpan();
+    public static implicit operator ReadOnlySpan<byte>(Utf8String value) => value.AsSpan();
 }

@@ -42,16 +42,6 @@ public unsafe struct StdString {
     public readonly ReadOnlySpan<byte> Slice(int start) => AsSpan().Slice(start);
     public readonly ReadOnlySpan<byte> Slice(int start, int length) => AsSpan().Slice(start, length);
 
-    [Obsolete("Use AsSpan() instead")]
-    public readonly byte[] GetBytes() {
-        var data = new byte[Length];
-        // If the string is too large to fit a span, it is also too large to fit an array:
-        // https://sharplab.io/#v2:EYLgtghglgdgNAFxAJwK4wD4AEBMAGAWAChcBGY4gNwmQAIbkIBPAfVNoF5aYBTAd1rAmCHgG1YCAHQBZCAA8AahAA2qHrQC0tAKwA2ALoBuKjXrJGrHJ279BwsRJnylq9Vu3ajQA===
-        // We are therefore not handling ≥ 2 GiB cases here - they should not happen in practice anyway.
-        AsSpan().CopyTo(data);
-        return data;
-    }
-
     public readonly override string ToString()
         => Encoding.UTF8.GetString(AsSpan());
 
