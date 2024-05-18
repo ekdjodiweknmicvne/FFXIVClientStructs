@@ -29,36 +29,36 @@ public unsafe partial struct RaptureAtkModule {
 
     [FieldOffset(0x87F7)] public AgentUpdateFlags AgentUpdateFlag; // reset happens in RaptureAtkModule_OnUpdate
     [FieldOffset(0x87F8)] internal fixed byte AddonAllocators[0x28 * 853];
-    [FieldOffset(0x10D40)] public Utf8String* AddonNames; // TODO: change to StdVector<Utf8String>
-    [FieldOffset(0x10D58)] public AddonConfig* AddonConfigPtr;
+    [FieldOffset(0x10D40 - 0x10)] public Utf8String* AddonNames; // TODO: change to StdVector<Utf8String>
+    [FieldOffset(0x10D58 - 0x10)] public AddonConfig* AddonConfigPtr;
 
-    [FieldOffset(0x10E10)] public UIModule* UIModulePtr;
-    [FieldOffset(0x10E18)] public RaptureLogModule* RaptureLogModulePtr;
-    [FieldOffset(0x10E20)] public AgentModule AgentModule;
-    [FieldOffset(0x11C18)] public RaptureHotbarModule* RaptureHotbarModulePtr;
-    [FieldOffset(0x11C20)] public RaptureAtkUnitManager RaptureAtkUnitManager;
-    [FieldOffset(0x1B938)] public RaptureAtkColorDataManager RaptureAtkColorDataManager;
+    [FieldOffset(0x10E1 - 0x100)] public UIModule* UIModulePtr;
+    [FieldOffset(0x10E18 - 0x10)] public RaptureLogModule* RaptureLogModulePtr;
+    [FieldOffset(0x10E20 - 0x10)] public AgentModule AgentModule;
+    [FieldOffset(0x11C18 - 0x10)] public RaptureHotbarModule* RaptureHotbarModulePtr;
+    [FieldOffset(0x11C20 - 0x10)] public RaptureAtkUnitManager RaptureAtkUnitManager;
+    [FieldOffset(0x1B938 - 0x10)] public RaptureAtkColorDataManager RaptureAtkColorDataManager;
 
-    [FieldOffset(0x1BBB8)] public int NameplateInfoCount;
+    [FieldOffset(0x1BBB8 - 0x10)] public int NameplateInfoCount;
     [Obsolete($"Use {nameof(NamePlateInfoEntriesSpan)}")]
-    [FieldOffset(0x1BBC0)] public NamePlateInfo NamePlateInfoArray; // 0-50, &NamePlateInfoArray[i]
+    [FieldOffset(0x1BBC0 - 0x10)] public NamePlateInfo NamePlateInfoArray; // 0-50, &NamePlateInfoArray[i]
     [FixedSizeArray<NamePlateInfo>(50)]
-    [FieldOffset(0x1BBC0)] public fixed byte NamePlateInfoEntries[0x248 * 50];
+    [FieldOffset(0x1BBC0 - 0x10)] public fixed byte NamePlateInfoEntries[0x248 * 50];
 
     [FixedSizeArray<CrystalCache>(18)]
-    [FieldOffset(0x22EA8)] public fixed byte CrystalItemCache[0x98 * 18];
-    [FieldOffset(0x23958)] public ItemCache* KeyItemCache; // ptr to 120 entries
-    [FieldOffset(0x23960)] public ItemCache* EquippedItemCache; // ptr to 14 entries
+    [FieldOffset(0x22EA8 - 0x10)] public fixed byte CrystalItemCache[0x98 * 18];
+    [FieldOffset(0x23958 - 0x10)] public ItemCache* KeyItemCache; // ptr to 120 entries
+    [FieldOffset(0x23960 - 0x10)] public ItemCache* EquippedItemCache; // ptr to 14 entries
     [FixedSizeArray<InventoryCache>(160)]
-    [FieldOffset(0x23968)] public fixed byte InventoryItemCache[0x88 * 160]; // see "E8 ?? ?? ?? ?? 48 8B 07 8D 55 05", only 140 slots are processed, unused?
-    [FieldOffset(0x28E68)] public uint InventoryItemCacheSlotCount;
-    [FieldOffset(0x28E6C)] public uint GilCap;
+    [FieldOffset(0x23968 - 0x10)] public fixed byte InventoryItemCache[0x88 * 160]; // see "E8 ?? ?? ?? ?? 48 8B 07 8D 55 05", only 140 slots are processed, unused?
+    [FieldOffset(0x28E68 - 0x10)] public uint InventoryItemCacheSlotCount;
+    [FieldOffset(0x28E6C - 0x10)] public uint GilCap;
 
-    [FieldOffset(0x28EB0)] public uint LocalPlayerClassJobId;
-    [FieldOffset(0x28EB4)] public uint LocalPlayerLevel;
+    [FieldOffset(0x28EB0 - 0x10)] public uint LocalPlayerClassJobId;
+    [FieldOffset(0x28EB4 - 0x10)] public uint LocalPlayerLevel;
 
-    [FieldOffset(0x28F48)] internal ExcelSheet* AddonParamSheet;
-    [FieldOffset(0x28F50)] public AtkTexture CharaViewDefaultBackgroundTexture; // "ui/common/CharacterBg.tex" (or _hr1 variant)
+    [FieldOffset(0x28F48 - 0x10)] internal ExcelSheet* AddonParamSheet;
+    [FieldOffset(0x28F50 - 0x10)] public AtkTexture CharaViewDefaultBackgroundTexture; // "ui/common/CharacterBg.tex" (or _hr1 variant)
 
     [FieldOffset(0x28F90)] internal nint ShellCommands; // only 1 function "48 83 EC 38 4C 8B C2 C7 44 24" to open links?
 
