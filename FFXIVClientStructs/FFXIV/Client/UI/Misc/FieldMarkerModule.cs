@@ -6,34 +6,32 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Misc;
 // Client::UI::Misc::FieldMarkerModule
 //   Client::UI::Misc::UserFileManager::UserFileEvent
 // ctor "E8 ?? ?? ?? ?? 33 C0 33 D2 41 B8 ?? ?? ?? ?? 48 89 87"
+[GenerateInterop]
+[Inherits<UserFileEvent>]
 [StructLayout(LayoutKind.Explicit, Size = 0xC78)]
 public unsafe partial struct FieldMarkerModule {
-    public static FieldMarkerModule* Instance() => Framework.Instance()->GetUiModule()->GetFieldMarkerModule();
+    public static FieldMarkerModule* Instance() => Framework.Instance()->GetUIModule()->GetFieldMarkerModule();
 
-    [FieldOffset(0)] public UserFileEvent UserFileEvent;
-    [FixedSizeArray<FieldMarkerPreset>(30)]
-    [FieldOffset(0x40)] public fixed byte PresetArray[30 * 0x68];
+    [FieldOffset(0x40), FixedSizeArray] internal FixedSizeArray30<FieldMarkerPreset> _presets;
 }
 
-[StructLayout(LayoutKind.Sequential, Pack = 0, Size = 0x0C)]
+[StructLayout(LayoutKind.Explicit, Size = 0x0C)]
 public struct GamePresetPoint {
-    public int X;
-    public int Y;
-    public int Z;
+    [FieldOffset(0x00)] public int X;
+    [FieldOffset(0x04)] public int Y;
+    [FieldOffset(0x08)] public int Z;
 }
 
-[StructLayout(LayoutKind.Sequential, Pack = 0, Size = 0x68)]
-public struct FieldMarkerPreset {
-    public GamePresetPoint A;
-    public GamePresetPoint B;
-    public GamePresetPoint C;
-    public GamePresetPoint D;
-    public GamePresetPoint One;
-    public GamePresetPoint Two;
-    public GamePresetPoint Three;
-    public GamePresetPoint Four;
-    public byte ActiveMarkers;
-    public byte Reserved;
-    public ushort ContentFinderConditionId;
-    public int Timestamp;
+[GenerateInterop]
+[StructLayout(LayoutKind.Explicit, Size = 0x68)]
+public partial struct FieldMarkerPreset {
+    [FieldOffset(0x00), FixedSizeArray] internal FixedSizeArray8<GamePresetPoint> _markers;
+    [FieldOffset(0x60)] public byte ActiveMarkers;
+    [FieldOffset(0x62)] public ushort ContentFinderConditionId;
+    [FieldOffset(0x64)] public int Timestamp;
+
+    public bool IsMarkerActive(int index) => (ActiveMarkers & 1 << index) != 0;
+    public void SetMarkerActive(int index, bool active) {
+        ActiveMarkers = (byte)(active ? ActiveMarkers | 1 << index : ActiveMarkers & ~(1 << index));
+    }
 }

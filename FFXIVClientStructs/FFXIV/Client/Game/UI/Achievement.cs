@@ -1,17 +1,14 @@
 namespace FFXIVClientStructs.FFXIV.Client.Game.UI;
 
-/// <summary>
-/// A struct representing the UIState Achievement
-/// </summary>
 // Client::Game::UI::Achievement
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x558)]
 public unsafe partial struct Achievement {
     [StaticAddress("48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 04 30", 3)]
     public static partial Achievement* Instance();
 
-    [FieldOffset(0x00)] public void** vtbl;
     [FieldOffset(0x08)] public AchievementState State;
-    [FieldOffset(0x0C)] public fixed byte CompletedAchievements[428];
+    [FieldOffset(0x0C), FixedSizeArray] internal FixedSizeArray428<byte> _completedAchievements;
 
     [FieldOffset(0x1DC)] public AchievementState ProgressRequestState;
     [FieldOffset(0x1E0)] public uint ProgressAchievementId;

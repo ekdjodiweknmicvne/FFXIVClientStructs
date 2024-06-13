@@ -1,30 +1,23 @@
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 // Client::UI::Agent::AgentModule
 // ctor "E8 ?? ?? ?? ?? 48 8B 85 ?? ?? ?? ?? 49 8B CE 48 89 87"
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0xDF8)]
 public unsafe partial struct AgentModule {
-    public static AgentModule* Instance() => Framework.Instance()->GetUiModule()->GetAgentModule();
+    public static AgentModule* Instance() => Framework.Instance()->GetUIModule()->GetAgentModule();
 
-    [FieldOffset(0x0)] public void* vtbl;
     [FieldOffset(0x8)] public UIModule* UIModule;
     [FieldOffset(0x10)] public byte Initialized;
-    [FieldOffset(0x11)] public byte Unk_11;
     [FieldOffset(0x14)] public uint FrameCounter;
     [FieldOffset(0x18)] public float FrameDelta;
 
-    [FixedSizeArray<Pointer<AgentInterface>>(441)]
-    [FieldOffset(0x20)] public fixed byte Agents[441 * 8];
+    [FieldOffset(0x20), FixedSizeArray] internal FixedSizeArray441<Pointer<AgentInterface>> _agents;
 
     [MemberFunction("E8 ?? ?? ?? ?? 0F B7 A8")]
-    public partial AgentInterface* GetAgentByInternalId(AgentId agentID);
-
-    [Obsolete("Use GetAgentByInternalId(AgentId)")]
-    public AgentInterface* GetAgentByInternalID(uint agentId)
-        => GetAgentByInternalId((AgentId)agentId);
+    public partial AgentInterface* GetAgentByInternalId(AgentId agentId);
 }
 
 public enum AgentId : uint {
@@ -61,7 +54,6 @@ public enum AgentId : uint {
     FishGuide = 29,
     FishRecord = 30,
 
-    [Obsolete("Renamed to QuestJournal")] Journal = 32,
     QuestJournal = 32,
     ActionMenu = 33,
     Marker = 34,
@@ -86,15 +78,13 @@ public enum AgentId : uint {
     ContentsFinder = 53,
     ContentsFinderSetting = 54,
     Social = 55,
-    SocialBlacklist = 56,
-    SocialFriendList = 57,
+    Blacklist = 56,
+    Friendlist = 57,
     Linkshell = 58,
-    SocialPartyMember = 59,
+    PartyMember = 59,
     // PartyInvite,
-    SocialSearch = 61,
+    Search = 61,
     Detail = 62,
-    [Obsolete("Renamed to Detail")]
-    SocialDetail = 62,
     LetterList = 63,
     LetterView = 64,
     LetterEdit = 65,
@@ -130,7 +120,6 @@ public enum AgentId : uint {
     GrandCompanyRank = 93,
     GrandCompanySupply = 94,
     GrandCompanyExchange = 95,
-    [Obsolete("Renamed to GearSet")] Gearset = 96,
     GearSet = 96,
     SupportMain = 97,
     SupportList = 98,
@@ -193,7 +182,7 @@ public enum AgentId : uint {
     ArmouryNotebook = 156,
     MinionNotebook = 157,
     MountNotebook = 158,
-    ItemCompare = 159,
+    ItemComp = 159,
     DailyQuestSupply = 160,
     MobHunt = 161,
     PatchMark = 162, // SelectOk?

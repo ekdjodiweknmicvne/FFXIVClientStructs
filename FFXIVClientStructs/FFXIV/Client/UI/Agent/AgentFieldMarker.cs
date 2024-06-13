@@ -1,17 +1,19 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentFieldMarker
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.FieldMarker)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0xCE0)]
 public unsafe partial struct AgentFieldMarker {
-    [FieldOffset(0x00)] public AgentInterface AgentInterface;
     [FieldOffset(0x34)] public byte ActiveMarkerFlags;
     [FieldOffset(0x38)] public int PageIndexOffset; //0 on page 1, 5 on page 2, 10 on page 3 etc.
 
-    [FixedSizeArray<Utf8String>(30)]
-    [FieldOffset(0x40)] public fixed byte PresetLabels[0x68 * 30];
+    [FieldOffset(0x40), FixedSizeArray] internal FixedSizeArray30<Utf8String> _presetLabels;
 
     [FieldOffset(0xC70)] public Utf8String TooltipString;
 

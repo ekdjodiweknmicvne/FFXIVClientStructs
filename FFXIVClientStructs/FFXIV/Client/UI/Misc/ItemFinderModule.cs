@@ -7,13 +7,13 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Misc;
 // Client::UI::Misc::ItemFinderModule
 //   Client::UI::Misc::UserFileManager::UserFileEvent
 // ctor "48 89 5C 24 ?? 57 48 83 EC 20 33 FF 48 89 51 10 48 8D 05 ?? ?? ?? ?? 48 89 79 08 48 8B D9 48 89 01 48 89 79 18 4C 8D 05 ?? ?? ?? ?? 89 79 20 8D 57 0C 48 89 79 28 89 79 3C 48 83 C1 30 E8 ?? ?? ?? ?? 89 BB"
+[GenerateInterop]
+[Inherits<UserFileEvent>]
 [StructLayout(LayoutKind.Explicit, Size = 0x11D0)]
 public unsafe partial struct ItemFinderModule {
-    public static ItemFinderModule* Instance() => Framework.Instance()->GetUiModule()->GetItemFinderModule();
+    public static ItemFinderModule* Instance() => Framework.Instance()->GetUIModule()->GetItemFinderModule();
 
-    [FieldOffset(0)] public UserFileEvent UserFileEvent;
-
-    [FieldOffset(0x40)] public fixed uint RequestItemIds[24];
+    [FieldOffset(0x40), FixedSizeArray] internal FixedSizeArray24<uint> _requestItemIds;
     [FieldOffset(0xA0)] public bool IsRequestUnfulfilled;
     [FieldOffset(0xA1)] public bool IsCabinetCached;
     [FieldOffset(0xA2)] public bool IsRetainerManagerReady; // only temporary set to true until request is complete
@@ -26,11 +26,11 @@ public unsafe partial struct ItemFinderModule {
     [FieldOffset(0xB0)] public long RetainerCount;
     [FieldOffset(0xB8)] public nint RetainerInventory;
     [FieldOffset(0xC0)] public long RetainerInventoryCount;
-    [FieldOffset(0xC8)] public fixed uint SaddleBagItemIds[70];
-    [FieldOffset(0x1E0)] public fixed uint PremiumSaddleBagItemIds[70];
-    [FieldOffset(0x2F8)] public fixed ushort SaddleBagItemCount[70];
-    [FieldOffset(0x384)] public fixed ushort PremiumSaddleBagItemCount[70];
-    [FieldOffset(0x410)] public fixed uint GlamourDresserItemIds[800];
+    [FieldOffset(0xC8), FixedSizeArray] internal FixedSizeArray70<uint> _saddleBagItemIds;
+    [FieldOffset(0x1E0), FixedSizeArray] internal FixedSizeArray70<uint> _premiumSaddleBagItemIds;
+    [FieldOffset(0x2F8), FixedSizeArray] internal FixedSizeArray70<ushort> _saddleBagItemCount;
+    [FieldOffset(0x384), FixedSizeArray] internal FixedSizeArray70<ushort> _premiumSaddleBagItemCount;
+    [FieldOffset(0x410), FixedSizeArray] internal FixedSizeArray800<uint> _glamourDresserItemIds;
 
     [FieldOffset(0x10A0)] public ItemFinderModuleResult* Result;
 

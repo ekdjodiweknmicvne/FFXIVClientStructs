@@ -3,6 +3,8 @@ using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 
 namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 
+// Client::Graphics::Render::Material
+//   Client::Graphics::ReferencedClassBase
 /// <summary>
 /// Represents a renderer material.
 /// </summary>
@@ -11,8 +13,10 @@ namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 /// On construction, ShaderKeyCount is determined by <see cref="ShaderPackage.MaterialKeyCount"/>, and TextureCount is the number of
 /// <see cref="ShaderPackage.Samplers"/> with <see cref="ShaderPackage.ConstantSamplerUnknown.Slot"/> == <see cref="ShaderPackage.SamplerSlotMaterial"/>.
 /// </remarks>
+[GenerateInterop]
+[Inherits<ReferencedClassBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0x40)]
-public unsafe struct Material {
+public unsafe partial struct Material {
     [StructLayout(LayoutKind.Explicit, Size = 0x18)]
     public struct TextureEntry {
         /// <summary>
@@ -26,7 +30,6 @@ public unsafe struct Material {
         public uint SamplerFlags;
     }
 
-    [FieldOffset(0x00)] public ReferencedClassBase ReferencedClassBase;
     /// <summary>
     /// The resource handle this material was instantiated from. Its <see cref="MaterialResourceHandle.Material"/> will be the current structure.
     /// </summary>
@@ -40,13 +43,13 @@ public unsafe struct Material {
     [FieldOffset(0x30)] public TextureEntry* Textures;
     [FieldOffset(0x38)] public ushort TextureCount;
 
-    public readonly int ShaderKeyCount
+    public int ShaderKeyCount
         => (int)((uint*)Textures - ShaderKeyValues);
 
-    public readonly Span<uint> ShaderKeyValuesSpan
+    public Span<uint> ShaderKeyValuesSpan
         => new(ShaderKeyValues, ShaderKeyCount);
 
-    public readonly Span<TextureEntry> TexturesSpan
+    public Span<TextureEntry> TexturesSpan
         => new(Textures, TextureCount);
 
     /// <summary>

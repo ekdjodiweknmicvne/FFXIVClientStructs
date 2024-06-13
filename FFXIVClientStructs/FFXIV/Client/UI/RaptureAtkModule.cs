@@ -10,18 +10,17 @@ namespace FFXIVClientStructs.FFXIV.Client.UI;
 // Client::UI::RaptureAtkModule
 //   Component::GUI::AtkModule
 //     Component::GUI::AtkModuleInterface
+[GenerateInterop]
+[Inherits<AtkModule>]
 [StructLayout(LayoutKind.Explicit, Size = 0x28F98)]
-[VTableAddress("33 C9 48 8D 05 ?? ?? ?? ?? 48 89 8F", 5)]
+[VirtualTable("33 C9 48 8D 05 ?? ?? ?? ?? 48 89 8F", 5)]
 public unsafe partial struct RaptureAtkModule {
     public static RaptureAtkModule* Instance() => UIModule.Instance()->GetRaptureAtkModule();
-
-    [FieldOffset(0x0)] public AtkModule AtkModule;
 
     [FieldOffset(0x82C0)] public ushort UiMode; // 0 = In Lobby, 1 = In Game
 
     [FieldOffset(0x8338)] internal Utf8String Unk8338;
-    [FixedSizeArray<Utf8String>(6)]
-    [FieldOffset(0x83A0)] internal fixed byte Unk83A0[0x68 * 6];
+    [FieldOffset(0x83A0), FixedSizeArray] internal FixedSizeArray6<Utf8String> _unkArray;
     [FieldOffset(0x8610)] public Utf8String ItalicOn; // <italic(1)>
     [FieldOffset(0x8678)] public Utf8String ItalicOff; // <italic(0)>
     [FieldOffset(0x86E0)] public Utf8String BoldOn; // <bold(1)>
@@ -29,7 +28,7 @@ public unsafe partial struct RaptureAtkModule {
 
     [FieldOffset(0x87F7)] public AgentUpdateFlags AgentUpdateFlag; // reset happens in RaptureAtkModule_OnUpdate
     [FieldOffset(0x87F8)] internal fixed byte AddonAllocators[0x28 * 853];
-    [FieldOffset(0x10D40 - 0x10)] public Utf8String* AddonNames; // TODO: change to StdVector<Utf8String>
+    [FieldOffset(0x10D40 - 0x10)] public StdVector<Utf8String> AddonNames;
     [FieldOffset(0x10D58 - 0x10)] public AddonConfig* AddonConfigPtr;
 
     [FieldOffset(0x10E1 - 0x100)] public UIModule* UIModulePtr;
@@ -40,17 +39,12 @@ public unsafe partial struct RaptureAtkModule {
     [FieldOffset(0x1B938 - 0x10)] public RaptureAtkColorDataManager RaptureAtkColorDataManager;
 
     [FieldOffset(0x1BBB8 - 0x10)] public int NameplateInfoCount;
-    [Obsolete($"Use {nameof(NamePlateInfoEntriesSpan)}")]
-    [FieldOffset(0x1BBC0 - 0x10)] public NamePlateInfo NamePlateInfoArray; // 0-50, &NamePlateInfoArray[i]
-    [FixedSizeArray<NamePlateInfo>(50)]
-    [FieldOffset(0x1BBC0 - 0x10)] public fixed byte NamePlateInfoEntries[0x248 * 50];
+    [FieldOffset(0x1BBC0 - 0x10), FixedSizeArray] internal FixedSizeArray50<NamePlateInfo> _namePlateInfoEntries;
 
-    [FixedSizeArray<CrystalCache>(18)]
-    [FieldOffset(0x22EA8 - 0x10)] public fixed byte CrystalItemCache[0x98 * 18];
+    [FieldOffset(0x22EA8 - 0x10), FixedSizeArray] internal FixedSizeArray18<CrystalCache> _crystalItemCache;
     [FieldOffset(0x23958 - 0x10)] public ItemCache* KeyItemCache; // ptr to 120 entries
     [FieldOffset(0x23960 - 0x10)] public ItemCache* EquippedItemCache; // ptr to 14 entries
-    [FixedSizeArray<InventoryCache>(160)]
-    [FieldOffset(0x23968 - 0x10)] public fixed byte InventoryItemCache[0x88 * 160]; // see "E8 ?? ?? ?? ?? 48 8B 07 8D 55 05", only 140 slots are processed, unused?
+    [FieldOffset(0x23968 - 0x10), FixedSizeArray] internal FixedSizeArray160<InventoryCache> _inventoryItemCache; // see "E8 ?? ?? ?? ?? 48 8B 07 8D 55 05", only 140 slots are processed, unused?
     [FieldOffset(0x28E68 - 0x10)] public uint InventoryItemCacheSlotCount;
     [FieldOffset(0x28E6C - 0x10)] public uint GilCap;
 
@@ -96,7 +90,7 @@ public unsafe partial struct RaptureAtkModule {
 
     [StructLayout(LayoutKind.Explicit, Size = 0x248)]
     public struct NamePlateInfo {
-        [FieldOffset(0x00)] public GameObjectID ObjectID;
+        [FieldOffset(0x00)] public GameObjectId ObjectId;
         [FieldOffset(0x30)] public Utf8String Name;
         [FieldOffset(0x98)] public Utf8String FcName;
         [FieldOffset(0x100)] public Utf8String Title;
@@ -109,8 +103,9 @@ public unsafe partial struct RaptureAtkModule {
     }
 
     // Client::UI::RaptureAtkModule::ItemCache
+    [GenerateInterop(isInherited: true)]
     [StructLayout(LayoutKind.Explicit, Size = 0x88)]
-    public struct ItemCache {
+    public partial struct ItemCache {
         [FieldOffset(0x8)] public Utf8String Name;
         [FieldOffset(0x70)] public uint Id;
         [FieldOffset(0x74)] public uint IconId;
@@ -123,16 +118,14 @@ public unsafe partial struct RaptureAtkModule {
     }
 
     // Client::UI::RaptureAtkModule::InventoryCache
+    [GenerateInterop, Inherits<ItemCache>]
     [StructLayout(LayoutKind.Explicit, Size = 0x88)]
-    public struct InventoryCache {
-        [FieldOffset(0)] public ItemCache ItemCache;
-    }
+    public partial struct InventoryCache;
 
     // Client::UI::RaptureAtkModule::CrystalCache
+    [GenerateInterop, Inherits<ItemCache>]
     [StructLayout(LayoutKind.Explicit, Size = 0x98)]
-    public struct CrystalCache {
-        [FieldOffset(0)] public ItemCache ItemCache;
-    }
+    public partial struct CrystalCache;
 
     [Flags]
     public enum AgentUpdateFlags : byte {
@@ -145,18 +138,4 @@ public unsafe partial struct RaptureAtkModule {
         MainCommandEnabledStateUpdate = 0x20,
         HousingInventoryUpdate = 0x40,
     }
-}
-
-[Flags]
-[Obsolete("Use AtkUnitManagerFlags instead")]
-public enum RaptureAtkModuleFlags : byte {
-    None = 0x00,
-    Unk01 = 0x01,
-    Unk02 = 0x02,
-    UiHidden = 0x04,
-    Unk08 = 0x08,
-    Unk10 = 0x10,
-    Unk20 = 0x20,
-    Unk40 = 0x40,
-    Unk80 = 0x80,
 }

@@ -1,8 +1,14 @@
 namespace FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
 
+// Client::Graphics::Kernel::ConstantBuffer
+//   Client::Graphics::Kernel::Buffer
+//     Client::Graphics::Kernel::Resource
+//       Client::Graphics::DelayedReleaseClassBase
+//         Client::Graphics::ReferencedClassBase
 /// <summary>
 /// A constant buffer (or cbuffer), which is used to send values to shaders. Usually contains 4*n floats.
 /// </summary>
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x70)]
 public unsafe partial struct ConstantBuffer {
     public const byte DefaultLoadSourcePointerFlags = 2;
@@ -14,13 +20,13 @@ public unsafe partial struct ConstantBuffer {
     [FieldOffset(0x28)]
     public void* UnsafeSourcePointer;
 
-    public readonly void* TryGetSourcePointer()
+    public void* TryGetSourcePointer()
         => (Flags & 0x4003) == 0 ? UnsafeSourcePointer : null;
 
-    public readonly Span<float> TryGetBuffer()
+    public Span<float> TryGetBuffer()
         => TryGetBuffer<float>();
 
-    public readonly Span<TContents> TryGetBuffer<TContents>() where TContents : unmanaged {
+    public Span<TContents> TryGetBuffer<TContents>() where TContents : unmanaged {
         var sourcePointer = TryGetSourcePointer();
         if (sourcePointer != null)
             return new Span<TContents>(sourcePointer, ByteSize / sizeof(TContents));
@@ -45,8 +51,8 @@ public unsafe partial struct ConstantBuffer {
 /// </summary>
 /// <typeparam name="TContents">Type of the cbuffer's contents. Usually a container of floats or vectors thereof.</typeparam>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe readonly struct ConstantBufferPointer<TContents> where TContents : unmanaged {
-    public readonly ConstantBuffer* CBuffer;
+public unsafe struct ConstantBufferPointer<TContents> where TContents : unmanaged {
+    public ConstantBuffer* CBuffer;
 
     public int Length
         => CBuffer == null ? 0 : (CBuffer->ByteSize / sizeof(TContents));
@@ -55,9 +61,9 @@ public unsafe readonly struct ConstantBufferPointer<TContents> where TContents :
         CBuffer = cBuffer;
     }
 
-    public readonly Span<TContents> TryGetBuffer()
+    public Span<TContents> TryGetBuffer()
         => CBuffer == null ? CBuffer->TryGetBuffer<TContents>() : default;
 
-    public readonly Span<TContents> LoadBuffer(int offset, int length, byte flags = ConstantBuffer.DefaultLoadSourcePointerFlags)
+    public Span<TContents> LoadBuffer(int offset, int length, byte flags = ConstantBuffer.DefaultLoadSourcePointerFlags)
         => CBuffer == null ? CBuffer->LoadBuffer<TContents>(offset, length, flags) : default;
 }

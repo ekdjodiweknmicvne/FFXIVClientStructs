@@ -3,11 +3,9 @@ namespace FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 // Client::System::Resource::Handle::ResourceHandle
 //   Client::System::Common::NonCopyable
 // ctor "E8 ?? ?? ?? ?? 81 A3 ?? ?? ?? ?? ?? ?? ?? ?? 48 8D 05"
+[GenerateInterop(isInherited: true)]
 [StructLayout(LayoutKind.Explicit, Size = 0xB0)]
 public unsafe partial struct ResourceHandle {
-    [FieldOffset(0x00), CExportIgnore] public void* vtbl;
-    [FieldOffset(0x00), CExportIgnore] public void** vfunc;
-
     [FieldOffset(0x08)] public ResourceHandleType Type;
 
     [FieldOffset(0x0C)] public uint FileType; // "txt" "uld" etc from the header

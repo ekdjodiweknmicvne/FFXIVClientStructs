@@ -1,15 +1,18 @@
 using FFXIVClientStructs.FFXIV.Client.Game.MJI;
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentMJIGatheringHouse
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.MJIGatheringHouse)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x200)]
 public unsafe partial struct AgentMJIGatheringHouse {
     public enum Confirmation : int { None, Start, ChangeExtend, Change, Extend }
 
-    [FieldOffset(0x000)] public AgentInterface AgentInterface;
     [FieldOffset(0x028)] public MJIManager* Manager;
     [FieldOffset(0x030)] public MJIGranariesState* GranariesState;
     [FieldOffset(0x038)] public AgentData* Data;
@@ -26,11 +29,11 @@ public unsafe partial struct AgentMJIGatheringHouse {
     [FieldOffset(0x1F8)] public int SelectExpeditionAddonHandle;
     [FieldOffset(0x1FC)] public Confirmation ConfirmType;
 
+    [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = 0x138)]
     public unsafe partial struct StringsData {
         [FieldOffset(0x00)] public Utf8String ConfirmText;
-        [FixedSizeArray<Utf8String>(MJIGranariesState.MaxGranaries)]
-        [FieldOffset(0x68)] public fixed byte FinishTimeText[MJIGranariesState.MaxGranaries * 0x68];
+        [FieldOffset(0x68), FixedSizeArray] internal FixedSizeArray2<Utf8String> _finishTimeText;
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 0xB8)]
@@ -45,12 +48,13 @@ public unsafe partial struct AgentMJIGatheringHouse {
         [FieldOffset(0xB0)] public bool Initialized;
     }
 
+    [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = 0x120)]
     public unsafe partial struct ExpeditionData {
         [FieldOffset(0x000)] public byte ExpeditionId;
         [FieldOffset(0x008)] public Utf8String Name;
-        [FieldOffset(0x070)] public fixed uint NormalItemIds[MJIGranaryState.MaxNormalResources];
-        [FieldOffset(0x0C0)] public fixed uint NormalIconIds[MJIGranaryState.MaxNormalResources];
+        [FieldOffset(0x070), FixedSizeArray] internal FixedSizeArray20<uint> _normalItemIds;
+        [FieldOffset(0x0C0), FixedSizeArray] internal FixedSizeArray20<uint> _normalIconIds;
         [FieldOffset(0x110)] public byte NumNormalItems;
         [FieldOffset(0x114)] public uint RareItemId;
         [FieldOffset(0x118)] public uint RareIconId;

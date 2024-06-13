@@ -2,20 +2,20 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
 
+// Client::UI::AddonCharacter
+//   Component::GUI::AtkUnitBase
+//     Component::GUI::AtkEventListener
 [Addon("Character")]
+[GenerateInterop]
+[Inherits<AtkUnitBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0x1C00)]
 public unsafe partial struct AddonCharacter {
-    [FieldOffset(0)] public AtkUnitBase AtkUnitBase;
-
-    [FixedSizeArray<Pointer<AtkComponentRadioButton>>(4)]
-    [FieldOffset(0x228)] public fixed byte RadioButtons[8 * 4];
+    [FieldOffset(0x228), FixedSizeArray] internal FixedSizeArray4<Pointer<AtkComponentRadioButton>> _radioButtons;
 
     [FieldOffset(0x488)] public int TabIndex;
     [FieldOffset(0x48C)] public int TabCount;
 
     [FieldOffset(0x490)] public AtkAddonControl AddonControl;
-    [Obsolete($"Use AddonControl.{nameof(AtkAddonControl.IsChildSetupComplete)}")]
-    [FieldOffset(0x4ED)] public bool EmbeddedAddonLoaded;
 
     [FieldOffset(0xBA8)] public AtkCollisionNode* CharacterPreviewCollisionNode;
 

@@ -1,24 +1,31 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using FFXIVClientStructs.FFXIV.Client.System.Memory;
+using FFXIVClientStructs.STD.Helper;
 
 namespace FFXIVClientStructs.FFXIV.Client.System.String;
 
 // Client::System::String::Utf8String
 // ctor "E8 ?? ?? ?? ?? 44 2B F7"
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x68)]
-public unsafe partial struct Utf8String : ICreatable, IDisposable {
+public unsafe partial struct Utf8String : ICreatable, IDisposable, IStaticNativeObjectOperation<Utf8String> {
     [FieldOffset(0x0)] public byte* StringPtr; // pointer to null-terminated string
     [FieldOffset(0x8)] public long BufSize; // default buffer = 0x40
+    /// <remarks>String length including null terminator.</remarks>
     [FieldOffset(0x10)] public long BufUsed;
-    [FieldOffset(0x18)] public long StringLength; // string length not including null terminator
-    [FieldOffset(0x20)] public byte IsEmpty;
-    [FieldOffset(0x21)] public byte IsUsingInlineBuffer;
+    /// <remarks>String length not including null terminator.</remarks>
+    [FieldOffset(0x18)] public long StringLength;
+    [FieldOffset(0x20)] public bool IsEmpty;
+    [FieldOffset(0x21)] public bool IsUsingInlineBuffer;
     [FieldOffset(0x22)] public fixed byte InlineBuffer[0x40]; // inline buffer used until strlen > 0x40
 
+    public static bool HasDefault => true;
+    public static bool IsDisposable => true;
+    public static bool IsCopyable => true;
+    public static bool IsMovable => true;
+
     public readonly int Length => Math.Max(0, (int)(BufUsed - 1));
-    [Obsolete("Use AsSpan() instead")]
-    public readonly ReadOnlySpan<byte> Span => new(StringPtr, Length);
 
     public readonly ref readonly byte this[int index] => ref AsSpan()[index];
 
@@ -61,9 +68,7 @@ public unsafe partial struct Utf8String : ICreatable, IDisposable {
     }
 
     public override string ToString() {
-        if (StringPtr == null || BufUsed <= 1)
-            return string.Empty;
-        return Encoding.UTF8.GetString(StringPtr, (int)BufUsed - 1);
+        return AsSpan().IsEmpty ? string.Empty : Encoding.UTF8.GetString(AsSpan());
     }
 
     public void Append(Utf8String* other) => Append((Utf8String*)Unsafe.AsPointer(ref this), other);
@@ -103,7 +108,7 @@ public unsafe partial struct Utf8String : ICreatable, IDisposable {
     [MemberFunction("E8 ?? ?? ?? ?? 49 83 6E")]
     public partial void Dtor();
 
-    [MemberFunction("E8 ?? ?? ?? ?? EB 30 40 84 F6"), GenerateCStrOverloads]
+    [MemberFunction("E8 ?? ?? ?? ?? EB 30 40 84 F6"), GenerateStringOverloads]
     public partial void SetString(byte* cStr);
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 3B DD")]
@@ -113,10 +118,10 @@ public unsafe partial struct Utf8String : ICreatable, IDisposable {
     public partial void Clear();
 
     [MemberFunction("E9 ?? ?? ?? ?? 48 2B D8")]
-    public partial bool EqualsUtf8(Utf8String* other);
+    public partial bool EqualTo(Utf8String* other);
 
-    [MemberFunction("E8 ?? ?? ?? ?? 8B 57 ?? 84 C0"), GenerateCStrOverloads]
-    public partial bool EqualsString(byte* other);
+    [MemberFunction("E8 ?? ?? ?? ?? 8B 57 ?? 84 C0"), GenerateStringOverloads]
+    public partial bool EqualToString(byte* other);
 
     [MemberFunction("45 33 C0 4C 8B C9 4C 39 41")]
     public partial Utf8String* ToLower();
@@ -147,6 +152,9 @@ public unsafe partial struct Utf8String : ICreatable, IDisposable {
     [MemberFunction("48 8B 01 0F B6 04")]
     public partial byte GetCharAt(ulong idx);
 
+    [MemberFunction("E8 ?? ?? ?? ?? EB 0A 48 8D 4C 24 ?? E8 ?? ?? ?? ?? 48 8D 8D")]
+    public partial void SanitizeString(ushort flags, Utf8String* characterList);
+
     public byte GetCharAt(int idx) => idx < 0 ? byte.MinValue : GetCharAt((ulong)idx);
 
     [MemberFunction("E8 ?? ?? ?? ?? 40 0F B6 C7 48 8D 35")]
@@ -154,4 +162,34 @@ public unsafe partial struct Utf8String : ICreatable, IDisposable {
 
     public static implicit operator ReadOnlySpan<byte>(in Utf8String value)
         => value.AsSpan();
+
+    public static int Compare(in Utf8String left, in Utf8String right) => left.AsSpan().SequenceCompareTo(right.AsSpan());
+
+    public static bool ContentEquals(in Utf8String left, in Utf8String right) => Unsafe.AsRef(in left).EqualTo((Utf8String*)Unsafe.AsPointer(ref Unsafe.AsRef(in right)));
+
+    public static void ConstructDefaultInPlace(out Utf8String item) {
+        item = default;
+        item.Ctor();
+    }
+
+    public static void StaticDispose(ref Utf8String item) => item.Dtor();
+
+    public static void ConstructCopyInPlace(in Utf8String source, out Utf8String target) {
+        ConstructDefaultInPlace(out target);
+        target.SetString(source);
+    }
+
+    public static void ConstructMoveInPlace(ref Utf8String source, out Utf8String target) {
+        (target, source) = (source, default);
+        if (target.IsUsingInlineBuffer)
+            target.StringPtr = (byte*)Unsafe.AsPointer(ref target.InlineBuffer[0]);
+    }
+
+    public static void Swap(ref Utf8String item1, ref Utf8String item2) {
+        (item1, item2) = (item2, item1);
+        if (item1.IsUsingInlineBuffer)
+            item1.StringPtr = (byte*)Unsafe.AsPointer(ref item1.InlineBuffer[0]);
+        if (item2.IsUsingInlineBuffer)
+            item2.StringPtr = (byte*)Unsafe.AsPointer(ref item2.InlineBuffer[0]);
+    }
 }

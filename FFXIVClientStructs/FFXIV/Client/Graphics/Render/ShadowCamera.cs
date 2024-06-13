@@ -1,6 +1,9 @@
 namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 
+// Client::Graphics::Render::ShadowCamera
+//   Client::Graphics::Render::Camera
+//     Client::Graphics::ReferencedClassBase
+[GenerateInterop]
+[Inherits<Camera>]
 [StructLayout(LayoutKind.Explicit, Size = 0x150)]
-public unsafe struct ShadowCamera {
-    [FieldOffset(0x00)] public Camera Camera;
-}
+public unsafe partial struct ShadowCamera;

@@ -6,13 +6,13 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Misc;
 // Client::UI::Misc::AchievementListModule
 //   Client::UI::Misc::UserFileManager::UserFileEvent
 // ctor "E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? 49 8B D4 E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? 49 8B D4 E8 ?? ?? ?? ?? 33 C0"
+[GenerateInterop]
+[Inherits<UserFileEvent>]
 [StructLayout(LayoutKind.Explicit, Size = 0x88)]
 public unsafe partial struct AchievementListModule {
-    public static AchievementListModule* Instance() => Framework.Instance()->GetUiModule()->GetAchievementListModule();
-
-    [FieldOffset(0)] public UserFileEvent UserFileEvent;
+    public static AchievementListModule* Instance() => Framework.Instance()->GetUIModule()->GetAchievementListModule();
     // [FieldOffset(0x40)] public byte Unk40;
-    [FieldOffset(0x42)] public fixed ushort Watchlist[30];
+    [FieldOffset(0x42), FixedSizeArray] internal FixedSizeArray30<ushort> _watchList;
     // [FieldOffset(0x7E)] public byte Unk7E;
     [FieldOffset(0x80)] public byte WatchlistCount; // 30 max
 

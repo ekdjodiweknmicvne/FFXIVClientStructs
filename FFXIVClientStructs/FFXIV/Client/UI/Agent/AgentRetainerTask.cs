@@ -1,12 +1,13 @@
-using FFXIVClientStructs.FFXIV.Component.GUI;
-
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentRetainerTask
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.RetainerTask)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x90)]
 public unsafe partial struct AgentRetainerTask {
-    [FieldOffset(0x00)] public AgentInterface AgentInterface;
-
     // 00 - None
     // 01 - Request Assignment
     // 02 - Venture in Progress

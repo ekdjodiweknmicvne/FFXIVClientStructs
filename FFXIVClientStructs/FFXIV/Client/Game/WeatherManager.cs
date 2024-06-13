@@ -4,21 +4,20 @@ namespace FFXIVClientStructs.FFXIV.Client.Game;
 /// <remarks>
 /// The weather changes every 8 hours.
 /// </remarks>
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x70)]
 public unsafe partial struct WeatherManager {
-    [FixedSizeArray<Pointer<ServerWeather>>(3)]
-    [FieldOffset(0x00)] internal fixed byte WeatherPtr[3 * 0x08];
-    [FixedSizeArray<ServerWeather>(3)]
-    [FieldOffset(0x18)] internal fixed byte Weather[3 * 0x18];
+    [StaticAddress("48 8D 0D ?? ?? ?? ?? 44 0F B7 45", 3)]
+    public static partial WeatherManager* Instance();
+
+    [FieldOffset(0x00), FixedSizeArray] internal FixedSizeArray3<Pointer<ServerWeather>> _weatherPtrs;
+    [FieldOffset(0x18), FixedSizeArray] internal FixedSizeArray3<ServerWeather> _weathers;
 
     [FieldOffset(0x60)] public byte WeatherIndex;
     [FieldOffset(0x64)] public byte WeatherId;
     [FieldOffset(0x65)] public byte WeatherOverride;
     [FieldOffset(0x66)] public byte CurrentDaytimeOffset;
     [FieldOffset(0x67)] public byte IndividualWeatherId;
-
-    [StaticAddress("48 8D 0D ?? ?? ?? ?? 44 0F B7 45", 3)]
-    public static partial WeatherManager* Instance();
 
     [MemberFunction("E8 ?? ?? ?? ?? 0F B6 C8 8D 41 ?? A9")]
     public partial byte GetCurrentWeather();

@@ -26,16 +26,16 @@ namespace FFXIVClientStructs.FFXIV.Client.Game.UI;
 /// 17 - Endwalker Elite
 /// </remarks>
 // Client::Game::UI::MobHunt
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x198)]
 public unsafe partial struct MobHunt {
     [StaticAddress("48 8D 0D ?? ?? ?? ?? 0F B6 50 08 E8 ?? ?? ?? ?? 84 C0 74 16", 3)]
     public static partial MobHunt* Instance();
 
-    [FieldOffset(0x08)] public fixed byte AvailableMarkId[18];
-    [FieldOffset(0x1A)] public fixed byte ObtainedMarkId[18];
+    [FieldOffset(0x08), FixedSizeArray] internal FixedSizeArray18<byte> _availableMarkId;
+    [FieldOffset(0x1A), FixedSizeArray] internal FixedSizeArray18<byte> _obtainedMarkId;
 
-    [FixedSizeArray<KillCounts>(18)]
-    [FieldOffset(0x2C)] public fixed byte CurrentKills[18 * 0x14];
+    [FieldOffset(0x2C), FixedSizeArray] internal FixedSizeArray18<KillCounts> _currentKills;
 
     [FieldOffset(0x194)] public int ObtainedFlags;
 
@@ -56,7 +56,7 @@ public unsafe partial struct MobHunt {
     /// <param name="itemId">Mark Bill ItemId</param>
     /// <returns>18 Indicates Not Found</returns>
     [MemberFunction("E8 ?? ?? ?? ?? 44 0F B6 E0 3C 12")]
-    public partial int GetMarkIndexFromItemId(int itemId);
+    public partial int GetMarkIndexFromItemId(uint itemId);
 
     [MemberFunction("48 89 5C 24 ?? 56 48 83 EC 20 40 32 F6")]
     public partial bool IsMarkBillUnlocked(byte markIndex);
@@ -64,9 +64,10 @@ public unsafe partial struct MobHunt {
     public bool IsMarkBillObtained(int index)
         => (ObtainedFlags & 1 << index) != 0;
 
+    [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = 0x14)]
-    public struct KillCounts {
-        [FieldOffset(0x00)] public fixed int Counts[5];
+    public partial struct KillCounts {
+        [FieldOffset(0x00), FixedSizeArray] internal FixedSizeArray5<int> _counts;
 
         public int this[int index] => Counts[index];
     }

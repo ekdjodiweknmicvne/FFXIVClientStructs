@@ -7,11 +7,12 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Misc;
 // Client::UI::Misc::BannerModule
 //   Client::UI::Misc::UserFileManager::UserFileEvent
 // ctor "E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? 49 8B D4 E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? 49 8B D4 E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? 49 8B D4 E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? 49 8B D4 E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? 49 8B D4 E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? 48 8B D7"
+[GenerateInterop]
+[Inherits<UserFileEvent>]
 [StructLayout(LayoutKind.Explicit, Size = 0x48)]
 public unsafe partial struct BannerModule {
-    public static BannerModule* Instance() => Framework.Instance()->GetUiModule()->GetBannerModule();
+    public static BannerModule* Instance() => Framework.Instance()->GetUIModule()->GetBannerModule();
 
-    [FieldOffset(0)] public UserFileEvent UserFileEvent;
     [FieldOffset(0x40)] public BannerModuleData* Data;
 
     /// <summary>
@@ -54,11 +55,11 @@ public unsafe partial struct BannerModule {
 }
 
 // ctor "E8 ?? ?? ?? ?? 48 89 43 40 48 8B 4B 40 48 85 C9 74 0A"
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x3E60)]
 public unsafe partial struct BannerModuleData {
-    [FixedSizeArray<BannerModuleEntry>(110)]
-    [FieldOffset(0x00)] public fixed byte Entries[0x90 * 110];
-    [FieldOffset(0x3DE0)] public fixed byte BannerId2BannerIndex[110];
+    [FieldOffset(0x00), FixedSizeArray] internal FixedSizeArray110<BannerModuleEntry> _entries;
+    [FieldOffset(0x3DE0), FixedSizeArray] internal FixedSizeArray110<byte> _bannerId2BannerIndex;
     [FieldOffset(0x3E4E)] public byte NextId;
 
     [FieldOffset(0x3E58)] public BannerModule* BannerModule;
@@ -71,10 +72,11 @@ public unsafe partial struct BannerModuleData {
 }
 
 // ctor "E8 ?? ?? ?? ?? 0F B6 84 3E"
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x90)]
 public unsafe partial struct BannerModuleEntry {
-    [FieldOffset(0x00)] public fixed byte BannerTimelineName[0x40];
-    // [FieldOffset(0x40)] public fixed byte Flags[4]; // see "8B C2 4C 8B C9 99"
+    [FieldOffset(0x00), FixedSizeArray(isString: true)] internal FixedSizeArray64<byte> _bannerTimelineName;
+    // [FieldOffset(0x40), FixedSizeArray] internal FixedSizeArray4<byte> _flags; // see "8B C2 4C 8B C9 99"
     [FieldOffset(0x44)] public HalfVector4 CameraPosition;
     [FieldOffset(0x4C)] public HalfVector4 CameraTarget;
     [FieldOffset(0x54)] public HalfVector2 HeadDirection;
@@ -83,8 +85,6 @@ public unsafe partial struct BannerModuleEntry {
     [FieldOffset(0x5E)] public short DirectionalLightingHorizontalAngle;
     [FieldOffset(0x60)] public byte Race; // CustomizeData[0]
     [FieldOffset(0x61)] public byte Sex; // CustomizeData[1]
-    [Obsolete("Renamed to Sex")]
-    [FieldOffset(0x61)] public byte Gender; // CustomizeData[1]
     [FieldOffset(0x62)] public byte Height; // CustomizeData[3]
     [FieldOffset(0x63)] public byte Tribe; // CustomizeData[4]
     [FieldOffset(0x64)] public byte DirectionalLightingColorRed;
@@ -93,11 +93,9 @@ public unsafe partial struct BannerModuleEntry {
     [FieldOffset(0x67)] public byte AmbientLightingColorRed;
     [FieldOffset(0x68)] public byte AmbientLightingColorGreen;
     [FieldOffset(0x69)] public byte AmbientLightingColorBlue;
-    // [FieldOffset(0x6A)] public byte Unk6A;
-    // [FieldOffset(0x6B)] public byte Unk6B;
     [FieldOffset(0x6C)] public float AnimationProgress;
     [FieldOffset(0x70)] public uint BannerTimelineIcon;
-    [FieldOffset(0x74)] public uint LastUpdated; // unix timestamp
+    [FieldOffset(0x74)] public int LastUpdated; // unix timestamp
     [FieldOffset(0x78)] public uint Checksum; // see GenerateChecksum
     [FieldOffset(0x7C)] public ushort BannerBg;
     [FieldOffset(0x7E)] public ushort BannerFrame;
@@ -112,11 +110,9 @@ public unsafe partial struct BannerModuleEntry {
     [FieldOffset(0x8B)] public byte DirectionalLightingBrightness;
     [FieldOffset(0x8C)] public byte AmbientLightingBrightness;
     [FieldOffset(0x8D)] public byte HasBannerTimelineCustomName;
-    // [FieldOffset(0x8E)] public byte Unk8E;
-    // [FieldOffset(0x8F)] public byte Unk8F;
 
     [MemberFunction("0F B7 42 7C 66 39 41 7C")]
-    public partial bool Equals(BannerModuleEntry* other);
+    public partial bool EqualTo(BannerModuleEntry* other);
 
     /// <param name="itemIds">A pointer to 14 Item Ids</param>
     /// <param name="stainIds">A pointer to 14 Stain Ids</param>

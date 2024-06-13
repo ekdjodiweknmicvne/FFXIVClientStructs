@@ -4,9 +4,10 @@ namespace FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 //   Client::Graphics::Scene::Object
 // base class for all drawn graphics objects
 // ctor "E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? E8 ?? ?? ?? ?? 81 A7"
+[GenerateInterop(isInherited: true)]
+[Inherits<Object>]
 [StructLayout(LayoutKind.Explicit, Size = 0x90)]
-public unsafe struct DrawObject {
-    [FieldOffset(0x0)] public Object Object;
+public unsafe partial struct DrawObject {
     [FieldOffset(0x88)] public byte Flags;
 
     public bool IsCoveredFromRain {

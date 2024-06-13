@@ -1,16 +1,19 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentMJIGatheringNoteBook
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.MJIGatheringNoteBook)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x30)]
 public unsafe partial struct AgentMJIGatheringNoteBook {
-    [FieldOffset(0)] public AgentInterface AgentInterface;
     [FieldOffset(0x28)] public AgentMJIGatheringNoteBookData* Data;
 
     [MemberFunction("40 53 48 83 EC 20 48 8B 41 28 48 8B D9 89 90")]
-    public readonly partial void SelectItem(uint itemIndex);
+    public partial void SelectItem(uint itemIndex);
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x1D0)]

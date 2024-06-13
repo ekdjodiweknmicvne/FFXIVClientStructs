@@ -4,9 +4,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using FFXIVClientStructs.Attributes;
-using FFXIVClientStructs.Interop.Attributes;
+using InteropGenerator.Runtime.Attributes;
 using Pastel;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -18,7 +19,6 @@ namespace CExporter;
 public class Exporter {
     private static List<ProcessedEnum> _enums = [];
     private static List<ProcessedStruct> _structs = [];
-    private static BindingFlags _bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
     private static HashSet<Type> _processType = [];
 
     public static string PassString(int i) => i switch {
@@ -49,9 +49,10 @@ public class Exporter {
         Console.WriteLine($"Filtered xiv to {xivStructs.Length} structs");
         Console.WriteLine("::endgroup::");
 
+        var structs = xivStructs.Concat(havokStructs).ToArray();
         var now = DateTime.UtcNow;
 
-        foreach (var sStruct in xivStructs.Concat(havokStructs)) {
+        foreach (var sStruct in structs) {
             ProcessType(sStruct);
         }
 
@@ -103,7 +104,7 @@ public class Exporter {
             foreach (var processedStructField in processedStruct.Fields) {
                 if (!check.TryGetValue(processedStruct.StructType.FullSanitizeName(), out var checkStrings)) continue;
                 if (checkStrings.Contains(processedStructField.FieldName))
-                    ExporterStatics.ErrorList.Add($"Field name overlap detected in {processedStruct.StructType.FullSanitizeName().Pastel(Color.Blue)} with field {processedStructField.FieldName.Pastel(Color.BlueViolet)}");
+                    ExporterStatics.ErrorList.Add($"Field name overlap detected in {processedStruct.StructType.FullSanitizeName().Pastel(Color.MediumSlateBlue)} with field {processedStructField.FieldName.Pastel(Color.Red)}");
             }
         }
     }
@@ -131,7 +132,7 @@ ReExport:
             .Build();
         var yaml = serializer.Serialize(new YamlExport {
             Enums = [.. _enums],
-            Structs = structsOrdered
+            Structs = structsOrdered.Select(t => t.FixOrder()).ToArray()
         });
 
         new FileInfo(Path.Join(dir.FullName, "ffxiv_structs.yml")).WriteFile(yaml);
@@ -195,6 +196,17 @@ ReExport:
                 FixedSize = size
             };
         }
+        if (field.FieldType.GetCustomAttribute<InlineArrayAttribute>() != null) {
+            var arrLength = field.FieldType.GetCustomAttribute<InlineArrayAttribute>()!.Length;
+            var elementType = field.FieldType.GetGenericArguments()[0];
+            _processType.Add(elementType);
+            return new ProcessedFixedField {
+                FieldType = elementType,
+                FieldOffset = field.GetFieldOffset() - offset,
+                FieldName = field.Name[1].ToString().ToUpper() + field.Name[2..],
+                FixedSize = arrLength
+            };
+        }
         _processType.Add(field.FieldType);
         return new ProcessedField {
             FieldType = field.FieldType,
@@ -229,11 +241,15 @@ ReExport:
             }
             if (!type.IsStruct() || type.IsEnum) return null;
             if (_structs.Any(t => t.StructType.FullSanitizeName() == type.FullSanitizeName())) return null;
-            var vtable = type.GetField("VTable", _bindingFlags)?.FieldType;
+            var vtable = type.GetField("VirtualTable", ExporterStatics.BindingFlags)?.FieldType;
             ProcessedVirtualFunction[] virtualFunctions = [];
             if (vtable != null) {
                 vtable = vtable.GetElementType()!;
-                virtualFunctions = vtable.GetFields(_bindingFlags).Select(f => {
+                var memberFunctions = type.GetMethods(ExporterStatics.BindingFlags).Where(t => t.GetCustomAttribute<VirtualFunctionAttribute>() != null).Select(t => new { Name = t.Name, Parameters = t.GetParameters(), ReturnType = t.ReturnType }).ToArray();
+                virtualFunctions = vtable.GetFields(ExporterStatics.BindingFlags).Select(f => {
+                    var memberFunction = memberFunctions.FirstOrDefault(t => t.Name == f.Name);
+                    var returnType = f.FieldType.GetFunctionPointerReturnType();
+                    if (memberFunction?.ReturnType != returnType) memberFunction = null;
                     _processType.Add(f.FieldType.GetFunctionPointerReturnType());
                     return new ProcessedVirtualFunction {
                         VirtualFunctionName = f.Name,
@@ -244,17 +260,17 @@ ReExport:
                             return new ProcessedField {
                                 FieldType = p,
                                 FieldOffset = -1,
-                                FieldName = i == 0 ? "this" : $"a{i + 1}"
+                                FieldName = i == 0 ? "this" : memberFunction?.Parameters[i - 1].Name ?? $"a{i + 1}"
                             };
                         }).ToArray()
                     };
                 }).ToArray();
             }
 
-            var memberFunctionClass = type.GetMember("MemberFunctionPointers", _bindingFlags).FirstOrDefault()?.DeclaringType;
+            var memberFunctionClass = type.GetMember("MemberFunctionPointers", ExporterStatics.BindingFlags).FirstOrDefault()?.DeclaringType;
             ProcessedMemberFunction[] memberFunctionsArray = [];
             if (memberFunctionClass != null) {
-                var memberFunctions = memberFunctionClass.GetMethods(_bindingFlags);
+                var memberFunctions = memberFunctionClass.GetMethods(ExporterStatics.BindingFlags);
                 foreach (var memberFunction in memberFunctions) {
                     var memberFunctionAddress = memberFunction.GetCustomAttribute<MemberFunctionAttribute>();
                     if (memberFunctionAddress == null) continue;
@@ -288,7 +304,7 @@ ReExport:
                 }
             }
 
-            var fields = type.GetFields(_bindingFlags);
+            var fields = type.GetFields(ExporterStatics.BindingFlags).Where(t => !type.IsInheritance(t)).ToArray();
             var unionFields = fields.Where(t => t.GetCustomAttribute<ObsoleteAttribute>() == null && t.GetCustomAttribute<CExportIgnoreAttribute>() == null && t.GetCustomAttribute<CExporterUnionAttribute>() != null).ToArray();
 
             var unionOffsets = new Dictionary<CExporterUnionAttribute, FieldInfo>(new CExporterUnionCompare());
@@ -323,14 +339,19 @@ ReExport:
                         ];
                     _processType.Add(unionField.FieldType);
                 }
-                foreach (var subStruct in unions.Where(t => !t.IsUnion)) {
+                foreach (var t1 in unions) {
+                    t1.StructSize = t1.Fields.Max(t => t.FieldOffset + t.FieldType.SizeOf());
+                }
+                var subUnions = unions.Where(t => !t.IsUnion).ToArray();
+                foreach (var subStruct in subUnions) {
                     var unionName = subStruct.StructNamespace.Split(ExporterStatics.Separator)[^1];
                     var unionNamespace = subStruct.StructNamespace[..subStruct.StructNamespace.LastIndexOf(ExporterStatics.Separator, StringComparison.Ordinal)];
-                    var unionStructIndex = unions.FindIndex(t => t.StructName == unionNamespace && t.StructName == unionName);
+                    var unionStructIndex = unions.FindIndex(t => t.StructNamespace == unionNamespace && t.StructName == unionName);
                     var unionStruct = unions[unionStructIndex];
                     unionStruct.Fields = [
                         .. unionStruct.Fields,
                         new ProcessedField {
+                            FieldTypeOverride = subStruct.StructTypeOverride,
                             FieldType = type,
                             FieldOffset = 0,
                             FieldName = subStruct.StructName
@@ -353,7 +374,7 @@ ReExport:
                 MemberFunctions = memberFunctionsArray
             };
 
-            foreach (var (unionAttr, fieldInfo) in unionOffsets) {
+            foreach (var (unionAttr, fieldInfo) in unionOffsets.Where(t => !t.Key.IsStruct)) {
                 processedStruct.Fields = [
                     .. processedStruct.Fields,
                     new ProcessedField {
@@ -405,6 +426,10 @@ public class ProcessedStruct {
     public required ProcessedMemberFunction[] MemberFunctions;
     [YamlIgnore]
     public Type[] Dependencies => Fields.Select(t => t.FieldType).Where(t => !(t.IsPointer() || t.IsPrimitive || t.IsFixedBuffer() || t.IsEnum || t.IsBaseType())).ToHashSet().ToArray();
+    public ProcessedStruct FixOrder() {
+        Fields = [.. Fields.OrderBy(t => t.FieldOffset)];
+        return this;
+    }
 }
 
 public class ProcessedEnum {
@@ -445,7 +470,7 @@ public class ProcessedEnumConverter : IYamlTypeConverter {
         emitter.Emit(new Scalar("values"));
         emitter.Emit(new MappingStart());
         foreach (var (key, val) in e.EnumValues) {
-            emitter.Emit(new Scalar(key));
+            emitter.Emit(new Scalar(AnchorName.Empty, TagName.Empty, key, ScalarStyle.DoubleQuoted, true, false));
             emitter.Emit(new Scalar(val));
         }
         emitter.Emit(new MappingEnd());

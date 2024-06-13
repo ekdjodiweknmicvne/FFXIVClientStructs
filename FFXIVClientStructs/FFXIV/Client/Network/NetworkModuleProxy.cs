@@ -1,16 +1,17 @@
+using FFXIVClientStructs.FFXIV.Application.Network;
+
 namespace FFXIVClientStructs.FFXIV.Client.Network;
 
+// Client::Network::NetworkModuleProxy
+//   Client::System::Common::NonCopyable
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x20)]
 public unsafe partial struct NetworkModuleProxy {
-    [FieldOffset(0x00)] public void* Vtbl;
     [FieldOffset(0x08)] public NetworkModule* NetworkModule;
-    [FieldOffset(0x10), Obsolete("Wrongly defined overflows struct size")] public NetworkModulePacketReceiverCallback PacketReceiverCallback;
+    [FieldOffset(0x10)] public NetworkModulePacketReceiverCallback* ReceiverCallback;
 
     [MemberFunction("E8 ?? ?? ?? ?? EB ?? 49 8B 85")]
     public partial bool IsInCrossWorldDuty();
-
-    [Obsolete("Renamed to IsInCrossWorldDuty")]
-    public bool IsInCrossWorlDuty() => IsInCrossWorldDuty();
 
     /// <summary>
     /// Gets current instance<br/>

@@ -2,17 +2,18 @@ using FFXIVClientStructs.FFXIV.Common.Configuration;
 
 namespace FFXIVClientStructs.FFXIV.Client.System.Framework;
 
-//Client::System::Framework::EnvironmentManager:
-//  Client::System::Framework::Task
-//  Common::Configuration::ConfigBase::ChangeEventInterface
-//ctor "E8 ?? ?? ?? ?? EB ?? 48 8B C6 BA ?? ?? ?? ?? 48 89 87 ?? ?? ?? ?? 44 8B C2"
+// Client::System::Framework::EnvironmentManager:
+//   Client::System::Framework::Task
+//   Common::Configuration::ConfigBase::ChangeEventInterface
+// ctor "E8 ?? ?? ?? ?? EB ?? 48 8B C6 BA ?? ?? ?? ?? 48 89 87 ?? ?? ?? ?? 44 8B C2"
 /// <summary>
 /// This class is a high level abstraction of sound and window systems. And handles sanity checks before propagating values to the more low-level classes respectively
 /// </summary>
+[GenerateInterop]
+[Inherits<Task>]
+[Inherits<ChangeEventInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x698)]
 public partial struct EnvironmentManager {
-    [FieldOffset(0x000)] public Task Task;
-    [FieldOffset(0x038)] public ChangeEventInterface ChangeEventInterface;
     /// <summary>
     ///Cutscene Audio Language (-1 indicates to use ClientLanguage) 
     /// </summary>

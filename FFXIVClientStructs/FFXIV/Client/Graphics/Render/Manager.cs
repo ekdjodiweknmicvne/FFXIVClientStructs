@@ -1,18 +1,17 @@
 namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 
 // Client::Graphics::Render::Manager
-//  Client::Graphics::Singleton<Client::Graphics::Render::Manager>
+//   Client::Graphics::Singleton<Client::Graphics::Render::Manager>
 // ctor "48 89 01 48 8D 59 08"
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x2D750)]
 public unsafe partial struct Manager {
-    [FieldOffset(0x0)] public void* Vtbl;
-    [FixedSizeArray<View>(32)]
-    [FieldOffset(0x8)] public fixed byte ViewArray[32 * 0x5A0]; // 32x Client::Graphics::Render::View
-
-    [FieldOffset(0x13660)] public ModelRenderer ModelRenderer;
-
     [StaticAddress("48 8B 05 ?? ?? ?? ?? 48 69 D1", 3, true)]
     public static partial Manager* Instance();
+
+    [FieldOffset(0x8), FixedSizeArray] internal FixedSizeArray32<View> _views;
+
+    [FieldOffset(0x13660)] public ModelRenderer ModelRenderer;
 
     public enum RenderViews : uint {
         OmniShadow0 = 0,

@@ -1,20 +1,24 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentRetainerItemTransfer
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.RetainerItemTransfer)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x38)]
 public unsafe partial struct AgentRetainerItemTransfer {
-    [FieldOffset(0x0)] public AgentInterface AgentInterface;
     [FieldOffset(0x28)] public AgentRetainerItemTransferData* Data;
 }
 
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x41E8)]
 public unsafe partial struct AgentRetainerItemTransferData {
     [FieldOffset(0x00)] public int ItemCount;
 
-    [FieldOffset(0x10), FixedSizeArray<DuplicateItemEntry>(140)] public fixed byte DuplicateItem[0x78 * 140];
+    [FieldOffset(0x10), FixedSizeArray] internal FixedSizeArray140<DuplicateItemEntry> _duplicateItems;
 
     [StructLayout(LayoutKind.Explicit, Size = 0x78)]
     public struct DuplicateItemEntry {

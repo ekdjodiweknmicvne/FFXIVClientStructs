@@ -2,12 +2,15 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
 
+// Client::UI::AddonBannerEditor
+//   Component::GUI::AtkUnitBase
+//     Component::GUI::AtkEventListener
 // ctor "40 53 48 83 EC 20 48 8B D9 E8 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 48 8B CB 48 89 03 E8 ?? ?? ?? ?? 48 8B D0 48 8D 8B ?? ?? ?? ?? E8 ?? ?? ?? ?? B9"
 [Addon("BannerEditor")]
+[GenerateInterop]
+[Inherits<AtkUnitBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0x4E8)]
-public unsafe struct AddonBannerEditor {
-    [FieldOffset(0)] public AtkUnitBase AtkUnitBase;
-
+public unsafe partial struct AddonBannerEditor {
     [FieldOffset(0x2D8)] public AtkComponentDropDownList* PresetDropdown;
     [FieldOffset(0x2F8)] public AtkComponentDropDownList* BackgroundDropdown;
     [FieldOffset(0x318)] public AtkComponentDropDownList* FrameDropdown;

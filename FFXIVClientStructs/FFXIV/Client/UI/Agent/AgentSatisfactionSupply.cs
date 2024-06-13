@@ -1,12 +1,15 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentSatisfactionSupply
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.SatisfactionSupply)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x500)]
 public unsafe partial struct AgentSatisfactionSupply {
-    [FieldOffset(0x00)] public AgentInterface AgentInterface;
 
     [FieldOffset(0x40)] public SatisfactionSupplyNpcInfo NpcInfo;
     [FieldOffset(0x5E)] public ushort ClassJobId;
@@ -16,16 +19,14 @@ public unsafe partial struct AgentSatisfactionSupply {
     [FieldOffset(0x7A)] public short LevelUnlocked;
     [FieldOffset(0x7C)] public byte CanGlamour;
 
-    [FixedSizeArray<ItemInfo>(3)]
-    [FieldOffset(0x80)] public fixed byte Item[0x3C * 3];
+    [FieldOffset(0x80), FixedSizeArray] internal FixedSizeArray3<ItemInfo> _items;
 
     [FieldOffset(0x138)] public void* ENpcResidentRow;
     [FieldOffset(0x140)] public void* Item1Row;
     [FieldOffset(0x148)] public void* Item2Row;
     [FieldOffset(0x150)] public void* Item3Row;
 
-    [FixedSizeArray<AgentDeliveryItemInfo>(3)]
-    [FieldOffset(0x158)] public fixed byte DeliveryInfo[0x108 * 3];
+    [FieldOffset(0x158), FixedSizeArray] internal FixedSizeArray3<AgentDeliveryItemInfo> _deliveryInfo;
 
     [FieldOffset(0x470)] public void* Item1Reward1Row;
     [FieldOffset(0x478)] public void* Item2Reward1Row;

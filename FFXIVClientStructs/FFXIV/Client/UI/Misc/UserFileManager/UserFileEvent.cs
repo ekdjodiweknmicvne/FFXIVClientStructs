@@ -2,14 +2,15 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Misc.UserFileManager;
 
 // Client::UI::Misc::UserFileManager::UserFileEvent
 // ctor inlined
+[GenerateInterop(isInherited: true)]
 [StructLayout(LayoutKind.Explicit, Size = 0x40)]
 public unsafe partial struct UserFileEvent {
-    [FieldOffset(0x08)] public ulong CharacterContentID;
+    [FieldOffset(0x08)] public ulong CharacterContentId;
     [FieldOffset(0x10)] public nint UserFileManager;
     [FieldOffset(0x18)] public nint TempDataPtr;
     [FieldOffset(0x20)] public uint TempDataBytesWritten;
 
-    [FieldOffset(0x30)] public fixed byte FileName[0xC];
+    [FieldOffset(0x30), FixedSizeArray(isString: true)] internal FixedSizeArray12<byte> _fileName;
     [FieldOffset(0x3C)] public bool Unk3C;
     [FieldOffset(0x3D)] public bool IsSavePending;
     [FieldOffset(0x3E)] public bool HasChanges;
@@ -44,7 +45,7 @@ public unsafe partial struct UserFileEvent {
     public partial byte GetIsSavePending();
 
     [VirtualFunction(11)]
-    public partial void SetCharacterContentId(ulong contentID);
+    public partial void SetCharacterContentId(ulong contentId);
 
     [VirtualFunction(12)]
     public partial void SaveFile(bool force);

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc.UserFileManager;
 
@@ -6,14 +7,14 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Misc;
 // Client::UI::Misc::RaptureGearsetModule
 //   Client::UI::Misc::UserFileManager::UserFileEvent
 // ctor "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 41 56 48 83 EC 20 45 33 F6 48 89 51 10 48 8D 05 ?? ?? ?? ?? 4C 89 71 08 49 8B D8"
-[VTableAddress("48 8D 05 ?? ?? ?? ?? 48 89 5F 40 48 8D 77 48", 3)]
+[GenerateInterop]
+[Inherits<UserFileEvent>]
+[VirtualTable("48 8D 05 ?? ?? ?? ?? 48 89 5F 40 48 8D 77 48", 3)]
 [StructLayout(LayoutKind.Explicit, Size = 0xB670)]
 public unsafe partial struct RaptureGearsetModule {
     public static RaptureGearsetModule* Instance() => UIModule.Instance()->GetRaptureGearsetModule();
 
-    [FieldOffset(0)] public UserFileEvent UserFileEvent;
-    [FixedSizeArray<GearsetEntry>(100)]
-    [FieldOffset(0x48)] public fixed byte Entries[0x1C0 * 100];
+    [FieldOffset(0x48), FixedSizeArray] internal FixedSizeArray100<GearsetEntry> _entries;
 
     [FieldOffset(0xB434)] public int CurrentGearsetIndex;
 
@@ -34,7 +35,7 @@ public unsafe partial struct RaptureGearsetModule {
     /// <param name="gearsetName">The name of the gearset to look up.</param>
     /// <returns>Returns the index/ID of a GearsetEntry</returns>
     [MemberFunction("E8 ?? ?? ?? ?? 8B D8 81 FB")]
-    public partial int FindGearsetIDByName(Utf8String* gearsetName);
+    public partial int FindGearsetIdByName(Utf8String* gearsetName);
 
     /// <summary>
     /// Check if a gearset at a specific index is valid.
@@ -225,45 +226,34 @@ public unsafe partial struct RaptureGearsetModule {
         SoulStone,
     }
 
+    [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = Size)]
-    public struct GearsetItem {
+    public partial struct GearsetItem {
         public const int Size = 0x1C;
 
-        [FieldOffset(0x00)] public uint ItemID;
+        [FieldOffset(0x00)] public uint ItemId;
         [FieldOffset(0x04)] public uint GlamourId;
         [FieldOffset(0x08)] public byte Stain;
 
-        [FieldOffset(0x0A)] public fixed ushort Materia[5];
-        [FieldOffset(0x14)] public fixed byte MateriaGrade[5];
+        [FieldOffset(0x0A), FixedSizeArray] internal FixedSizeArray5<ushort> _materia;
+        [FieldOffset(0x14), FixedSizeArray] internal FixedSizeArray5<byte> _materiaGrades;
         [FieldOffset(0x19)] public GearsetItemFlag Flags;
     }
 
+    [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = 0x1C0)]
     public partial struct GearsetEntry {
-        [FieldOffset(0x00)] public byte ID;    // This may actually be set number, which is not _quite_ ID.
-        [FieldOffset(0x01)] public fixed byte Name[0x30];
+        [FieldOffset(0x00)] public byte Id;    // This may actually be set number, which is not _quite_ ID.
+        [FieldOffset(0x01), FixedSizeArray(isString: true)] internal FixedSizeArray48<byte> _name;
         [FieldOffset(0x31)] public byte ClassJob;
         [FieldOffset(0x32)] public byte GlamourSetLink;
         [FieldOffset(0x34)] public short ItemLevel;
         /// <remarks>This is the BannerIndex, but offset by 1. If it's 0, the gearset is not linked to a banner.</remarks>
         [FieldOffset(0x36)] public byte BannerIndex;
         [FieldOffset(0x37)] public GearsetFlag Flags;
-        [FixedSizeArray<GearsetItem>(14)]
-        [FieldOffset(0x38)] public fixed byte Items[0x1C * 14];
-        [FieldOffset(0x38 + GearsetItem.Size * 00), Obsolete("Use ItemsSpan[0]")] public GearsetItem MainHand;
-        [FieldOffset(0x38 + GearsetItem.Size * 01), Obsolete("Use ItemsSpan[1]")] public GearsetItem OffHand;
-        [FieldOffset(0x38 + GearsetItem.Size * 02), Obsolete("Use ItemsSpan[2]")] public GearsetItem Head;
-        [FieldOffset(0x38 + GearsetItem.Size * 03), Obsolete("Use ItemsSpan[3]")] public GearsetItem Body;
-        [FieldOffset(0x38 + GearsetItem.Size * 04), Obsolete("Use ItemsSpan[4]")] public GearsetItem Hands;
-        [FieldOffset(0x38 + GearsetItem.Size * 05), Obsolete("Use ItemsSpan[5]")] public GearsetItem Belt;
-        [FieldOffset(0x38 + GearsetItem.Size * 06), Obsolete("Use ItemsSpan[6]")] public GearsetItem Legs;
-        [FieldOffset(0x38 + GearsetItem.Size * 07), Obsolete("Use ItemsSpan[7]")] public GearsetItem Feet;
-        [FieldOffset(0x38 + GearsetItem.Size * 08), Obsolete("Use ItemsSpan[8]")] public GearsetItem Ears;
-        [FieldOffset(0x38 + GearsetItem.Size * 09), Obsolete("Use ItemsSpan[9]")] public GearsetItem Neck;
-        [FieldOffset(0x38 + GearsetItem.Size * 10), Obsolete("Use ItemsSpan[10]")] public GearsetItem Wrists;
-        [FieldOffset(0x38 + GearsetItem.Size * 11), Obsolete("Use ItemsSpan[11]")] public GearsetItem RingRight;
-        [FieldOffset(0x38 + GearsetItem.Size * 12), Obsolete("Use ItemsSpan[12]")] public GearsetItem RingLeft; // aka RightLeft
-        [FieldOffset(0x38 + GearsetItem.Size * 13), Obsolete("Use ItemsSpan[13]")] public GearsetItem SoulStone;
+        [FieldOffset(0x38), FixedSizeArray] internal FixedSizeArray14<GearsetItem> _items;
+
+        [UnscopedRef] public ref GearsetItem GetItem(GearsetItemIndex index) => ref Items[(int)index];
 
         /// <returns>Returns a pointer to the BannerModuleEntry* or null if the gearset is not linked to a banner.</returns>
         public BannerModuleEntry* GetBanner() {

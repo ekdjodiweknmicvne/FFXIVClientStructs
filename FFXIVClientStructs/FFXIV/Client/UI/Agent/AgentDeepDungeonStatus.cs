@@ -1,25 +1,27 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentDeepDungeonStatus
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.DeepDungeonStatus)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x30)]
 public unsafe partial struct AgentDeepDungeonStatus {
-    [FieldOffset(0x00)] public AgentInterface AgentInterface;
     [FieldOffset(0x28)] public DeepDungeonStatusData* Data;
 }
 
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x8D8)]
 public unsafe partial struct DeepDungeonStatusData {
     [FieldOffset(0x00)] public uint Level;
     [FieldOffset(0x04)] public uint MaxLevel;
     [FieldOffset(0x08)] public uint ClassJobId;
 
-    [FixedSizeArray<DeepDungeonStatusItem>(16)]
-    [FieldOffset(0x18)] public fixed byte Pomander[16 * 0x70]; // 16 * DeepDungeonStatusItem
-    [FixedSizeArray<DeepDungeonStatusItem>(4)]
-    [FieldOffset(0x718)] public fixed byte Magicite[4 * 0x70]; // 4 * DeepDungeonStatusItem
+    [FieldOffset(0x18), FixedSizeArray] internal FixedSizeArray16<DeepDungeonStatusItem> _pomander;
+    [FieldOffset(0x718), FixedSizeArray] internal FixedSizeArray4<DeepDungeonStatusItem> _magicite;
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x70)]

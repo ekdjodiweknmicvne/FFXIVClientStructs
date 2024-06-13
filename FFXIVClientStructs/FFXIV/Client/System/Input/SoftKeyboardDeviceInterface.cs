@@ -1,9 +1,11 @@
+using FFXIVClientStructs.FFXIV.Client.System.String;
+
 namespace FFXIVClientStructs.FFXIV.Client.System.Input;
 
+// Client::System::Input::SoftKeyboardDeviceInterface
+[GenerateInterop(isInherited: true)]
 [StructLayout(LayoutKind.Explicit, Size = 0x08)]
 public unsafe partial struct SoftKeyboardDeviceInterface {
-    [FieldOffset(0x00), CExportIgnore] public void** vtbl;
-
     [VirtualFunction(0)]
     public partial void Dtor(bool freeMemory);
 
@@ -27,4 +29,19 @@ public unsafe partial struct SoftKeyboardDeviceInterface {
 
     [VirtualFunction(7)]
     public partial bool IsSoftKeyboardOpen();
+
+    // Client::System::Input::SoftKeyboardDeviceInterface::SoftKeyboardInputInterface
+    [GenerateInterop]
+    [StructLayout(LayoutKind.Explicit, Size = 0x8)]
+    public unsafe partial struct SoftKeyboardInputInterface {
+        // CAUTION: May be the concrete class' dtor!
+        [VirtualFunction(0)]
+        public partial void Dtor(bool freeMemory);
+
+        [VirtualFunction(2)]
+        public partial void WriteString(Utf8String* stringToWrite);
+
+        [VirtualFunction(4)]
+        public partial uint GetInputMaxLength();
+    }
 }

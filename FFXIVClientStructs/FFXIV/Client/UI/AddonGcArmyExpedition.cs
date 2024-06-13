@@ -2,11 +2,14 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
 
+// Client::UI::AddonGcArmyExpedition
+//   Component::GUI::AtkUnitBase
+//     Component::GUI::AtkEventListener
 [Addon("GcArmyExpedition")]
+[GenerateInterop]
+[Inherits<AtkUnitBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0x2E8)]
-public unsafe struct AddonGcArmyExpedition {
-    [FieldOffset(0x00)] public AtkUnitBase AtkUnitBase;
-
+public unsafe partial struct AddonGcArmyExpedition {
     [FieldOffset(0x220)] public AtkComponentButton* DeployButton;
     [FieldOffset(0x228)] public AtkComponentList* MissionList;
     [FieldOffset(0x238)] public AtkTextNode* ListHeaderTextNode;

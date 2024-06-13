@@ -1,6 +1,8 @@
-namespace FFXIVClientStructs.Havok;
+using FFXIVClientStructs.Havok.Common.Base.Object;
 
-[StructLayout(LayoutKind.Sequential)]
-public struct hkLocalFrame {
-    public hkReferencedObject hkReferencedObject;
-}
+namespace FFXIVClientStructs.Havok.Common.Base.Types.Geometry.LocalFrame;
+
+[GenerateInterop]
+[Inherits<hkReferencedObject>]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public partial struct hkLocalFrame;

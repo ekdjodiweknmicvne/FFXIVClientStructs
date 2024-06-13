@@ -1,15 +1,17 @@
-using FFXIVClientStructs.FFXIV.Component.GUI;
-
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentTelepotTown
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.TelepotTown)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x30)]
 public unsafe partial struct AgentTelepotTown {
-    [FieldOffset(0)] public AgentInterface AgentInterface;
     [FieldOffset(0x28)] public AgentTelepotTownData* Data;
 
     [MemberFunction("48 89 5C 24 ?? 57 48 83 EC 50 0F B6 FA")]
-    public readonly partial void TeleportToAetheryte(byte index);
+    public partial void TeleportToAetheryte(byte index);
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0xD168)]

@@ -2,18 +2,20 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.Excel;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Component.Text;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentLobby
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 // ctor "E8 ?? ?? ?? ?? EB 03 48 8B C5 45 33 C9 48 89 47 20"
 [Agent(AgentId.Lobby)]
-[VTableAddress("48 8D 05 ?? ?? ?? ?? 48 89 71 18 48 89 01", 3)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x1DF8)]
+[VirtualTable("48 8D 05 ?? ?? ?? ?? 48 89 71 18 48 89 01", 3)]
 public unsafe partial struct AgentLobby {
-    [FieldOffset(0)] public AgentInterface AgentInterface;
-
     [FieldOffset(0x40)] public LobbyData LobbyData; // for lack of a better name
     [FieldOffset(0xA00)] public UIModule* UIModule;
     [FieldOffset(0xA08)] internal nint TitleScreenMoviePtr;
@@ -28,12 +30,9 @@ public unsafe partial struct AgentLobby {
     [FieldOffset(0xA48)] public ExcelSheet* LobbySheet;
     [FieldOffset(0xA50)] public NetworkModuleProxy* NetworkModuleProxy;
     [FieldOffset(0xA58)] public StdDeque<TextParameter> LobbyTextParameters;
-    [FixedSizeArray<Utf8String>(13)]
-    [FieldOffset(0xA80)] public fixed byte Utf8StringsData[0x68 * 13];
+    [FieldOffset(0xA80), FixedSizeArray] internal FixedSizeArray13<Utf8String> _tempUtf8Strings;
 
     [FieldOffset(0x10E0)] public sbyte ServiceAccountIndex;
-    [Obsolete("Renamed to HoveredCharacterIndex")]
-    [FieldOffset(0x10E1)] public sbyte SelectedCharacterIndex;
     [FieldOffset(0x10E1)] public sbyte HoveredCharacterIndex; // index in CharaSelectCharacterList
     [FieldOffset(0x10E8)] public ulong HoveredCharacterContentId;
     [FieldOffset(0x10F0)] public byte DataCenter;
@@ -45,8 +44,6 @@ public unsafe partial struct AgentLobby {
     [FieldOffset(0x10FC)] public uint DialogAddonId2;
     [FieldOffset(0x1100)] public uint LobbyScreenTextAddonId;
 
-    [Obsolete("Invalid type: this field is a byte, not a bool. Use LobbyUpdateStage.")] // used for a switch in AgentLobby_Update
-    [FieldOffset(0x1104)] public bool RequestedDataReady;
     [FieldOffset(0x1104)] public byte LobbyUpdateStage;
 
     [FieldOffset(0x1107)] public byte LobbyUIStage;
@@ -63,15 +60,16 @@ public unsafe partial struct AgentLobby {
     [FieldOffset(0x1DA4)] public bool HasShownCharacterNotFound; // "The character you last logged out with in this play environment could not be found on the current data center."
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? 41 8B D6")]
-    public readonly partial void UpdateLobbyUIStage();
+    public partial void UpdateLobbyUIStage();
 
     [MemberFunction("E8 ?? ?? ?? ?? 84 C0 74 07 C6 86 ?? ?? ?? ?? ?? 48 8B 8C 24")]
-    public readonly partial void UpdateCharaSelectDisplay(sbyte index, bool a2);
+    public partial void UpdateCharaSelectDisplay(sbyte index, bool a2);
 
     [MemberFunction("E8 ?? ?? ?? ?? EB 4A 84 C0")]
-    public readonly partial void OpenLoginWaitDialog(int position);
+    public partial void OpenLoginWaitDialog(int position);
 }
 
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x9C0)]
 public unsafe partial struct LobbyData {
     [FieldOffset(0)] public AgentLobby* AgentLobby;
@@ -88,44 +86,13 @@ public unsafe partial struct LobbyData {
     [FieldOffset(0x9BE)] public ushort HomeWorldId;
 
     [MemberFunction("40 53 56 41 57 48 83 EC 20 33 DB")]
-    public partial CharaSelectCharacterEntry* GetCharacterEntryFromServer(byte index, long contentId);
+    public partial CharaSelectCharacterEntry* GetCharacterEntryFromServer(byte index, ulong contentId);
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 85 C0 74 2C 48 8D 48 2C")]
     public partial CharaSelectCharacterEntry* GetCharacterEntryByIndex(int a2, int worldIndex, int characterMappingIndex);
 }
 
-[VTableAddress("48 8D 05 ?? ?? ?? ?? 48 8B F9 48 89 01 48 81 C1 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 8F", 3)]
-[StructLayout(LayoutKind.Explicit, Size = 0x848)]
-public unsafe partial struct LobbyUIClient {
-    [FieldOffset(0x00), Obsolete("Use LobbyUIClient.StaticAddressPointers.VTable")] public void** vtbl;
-    [FieldOffset(0x10)] public NetworkModuleProxy* NetworkModuleProxy;
-    //[FieldOffset(0x18)] public ?* NetworConfig; // contains hosts and ports
-
-    [FieldOffset(0x30)] public StdVector<LobbyDataCenterWorldEntry> CurrentDataCenterWorlds;
-
-    [FieldOffset(0x48)] public LobbySubscriptionInfo* SubscriptionInfo;
-}
-
-[StructLayout(LayoutKind.Explicit, Size = 0x54)]
-public unsafe struct LobbyDataCenterWorldEntry {
-    [FieldOffset(0)] public ushort Id; // RowId in World sheet
-    [FieldOffset(0x2)] public ushort Index;
-
-    [FieldOffset(0x14)] public fixed byte Name[32]; // size unknown
-}
-
-[StructLayout(LayoutKind.Explicit, Size = 0x40)] // size unknown
-public unsafe struct LobbySubscriptionInfo // name probably totally wrong
-{
-    [FieldOffset(0x8)] public uint Flags;
-
-    [FieldOffset(0x2D)] public byte VeteranRewardRank;
-
-    [FieldOffset(0x30)] public uint TotalDaysSubscribed;
-    [FieldOffset(0x34)] public uint DaysRemaining;
-    [FieldOffset(0x38)] public uint DaysUntilNextVeteranRank;
-}
-
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x6F8)]
 public unsafe partial struct CharaSelectCharacterEntry {
     [FieldOffset(0x8)] public ulong ContentId;
@@ -135,10 +102,10 @@ public unsafe partial struct CharaSelectCharacterEntry {
     [FieldOffset(0x18)] public ushort CurrentWorldId;
     [FieldOffset(0x1A)] public ushort HomeWorldId;
 
-    [FieldOffset(0x2C)] public fixed byte Name[32];
-    [FieldOffset(0x4C)] public fixed byte CurrentWorldName[32];
-    [FieldOffset(0x6C)] public fixed byte HomeWorldName[32];
-    [FieldOffset(0x8C)] public fixed byte RawJson[1024];
+    [FieldOffset(0x2C), FixedSizeArray(isString: true)] internal FixedSizeArray32<byte> _name;
+    [FieldOffset(0x4C), FixedSizeArray(isString: true)] internal FixedSizeArray32<byte> _currentWorldName;
+    [FieldOffset(0x6C), FixedSizeArray(isString: true)] internal FixedSizeArray32<byte> _homeWorldName;
+    [FieldOffset(0x8C), FixedSizeArray(isString: true)] internal FixedSizeArray1024<byte> _rawJson;
 
     [FieldOffset(0x4A0)] public StdVector<Pointer<CharaSelectRetainerInfo>> RetainerInfo;
 
@@ -156,22 +123,21 @@ public enum CharaSelectCharacterEntryLoginFlags : byte {
     None = 0,
     Locked = 1, // Lobby#64: "You cannot select this character with your current account."
     NameChangeRequired = 2, // Lobby#26: "A name change is required to log in with this character."
-    [Obsolete("Renamed to MissingExVersionForLogin")]
-    ExpansionMissing = 4,
     MissingExVersionForLogin = 4, // Lobby#68: "To log in with this character you must first install <ExVersion>."
     MissingExVersionForCharacterEdit = 8, // Lobby#69: "To edit this character's race, sex, or appearance you must first install <ExVersion>."
     DCTraveling = 16,// Lobby#1175: "This character is currently visiting the <value> data center."
     Unk32 = 32, // unsure. sidebar should change to Lobby#1153 "TRAVELED TO" and might print LogMessage#5800 "Unable to execute command. Character is currently visiting the <string(lstr1)> data center."
 }
 
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x58)]
-public unsafe struct CharaSelectRetainerInfo {
+public unsafe partial struct CharaSelectRetainerInfo {
     [FieldOffset(0)] public ulong RetainerId;
     [FieldOffset(0x8)] public ulong OwnerContentId;
     [FieldOffset(0x10)] public ushort Index; // guessed
     [FieldOffset(0x12)] public CharaSelectRetainerInfoLoginFlags LoginFlags;
 
-    [FieldOffset(0x18)] public fixed byte Name[32];
+    [FieldOffset(0x18), FixedSizeArray(isString: true)] internal FixedSizeArray32<byte> _name;
 }
 
 public enum CharaSelectRetainerInfoLoginFlags : ushort {
@@ -180,12 +146,13 @@ public enum CharaSelectRetainerInfoLoginFlags : ushort {
     NameChangeRequired = 4 // Lobby#66: "Please change your retainer's name after retrieving your character's data./To log in with this character you must first change your retainer's name."
 }
 
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x1E2)]
-public unsafe struct CharaSelectCharacterInfo {
-    [FieldOffset(0x8)] public fixed byte Name[32];
+public unsafe partial struct CharaSelectCharacterInfo {
+    [FieldOffset(0x8), FixedSizeArray(isString: true)] internal FixedSizeArray32<byte> _name;
     [FieldOffset(0x28)] public byte CurrentClassJobId;
 
-    [FieldOffset(0x2A)] public fixed ushort ClassJobLevelArray[30];
+    [FieldOffset(0x2A), FixedSizeArray] internal FixedSizeArray30<ushort> _classJobLevels;
     [FieldOffset(0x66)] public byte Race;
     [FieldOffset(0x67)] public byte Tribe;
     [FieldOffset(0x68)] public byte Sex;
@@ -217,7 +184,7 @@ public unsafe struct CharaSelectCharacterInfo {
     // [FieldOffset(0xD4)] public uint RemakeFlag;
     [FieldOffset(0xD8)] public CharaSelectCharacterConfigFlags ConfigFlags;
     [FieldOffset(0xDA)] public byte VoiceId;
-    // [FieldOffset(0xDB)] public fixed byte WorldName[32]; // always empty?
+    // [FieldOffset(0xDB), FixedSizeArray] internal FixedSizeArray32<byte> _worldName; // always empty?
 
     // [FieldOffset(0x100)] public ulong LoginStatus;
     // [FieldOffset(0x108)] public byte IsOutTerritory;
@@ -234,25 +201,4 @@ public enum CharaSelectCharacterConfigFlags : ushort {
     StoreCraftedItemsInInventory = 0x20,
     CloseVisor = 0x40
     // ? = 0x80
-}
-
-[StructLayout(LayoutKind.Explicit, Size = 40 * 0x10)]
-public unsafe partial struct CharaSelectCharacterList {
-    [StaticAddress("4C 8D 3D ?? ?? ?? ?? 48 8B DA", 3)]
-    public static partial CharaSelectCharacterList* Instance();
-
-    [StaticAddress("48 89 2D ?? ?? ?? ?? 48 8B 6C 24", 3, true)]
-    public static partial Character* GetCurrentCharacter();
-
-    [MemberFunction("E8 ?? ?? ?? ?? 66 44 89 B6")]
-    public static partial void CleanupCharacters();
-
-    [FixedSizeArray<CharaSelectCharacterMapping>(40)]
-    [FieldOffset(0)] public fixed byte CharacterMapping[40 * 0x10];
-}
-
-[StructLayout(LayoutKind.Explicit, Size = 0x10)]
-public struct CharaSelectCharacterMapping {
-    [FieldOffset(0)] public ulong ContentId;
-    [FieldOffset(8)] public short ClientObjectIndex; // index in ClientObjectManager
 }

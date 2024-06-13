@@ -1,9 +1,15 @@
 // Suppress Inconsistent Naming due to VirtualKeyCode Names 
 // ReSharper disable InconsistentNaming
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc.UserFileManager;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
 
+// Client::UI::UIInputData
+//   Component::GUI::AtkInputData
+//   Client::UI::Misc::UserFileManager::UserFileEvent
+[GenerateInterop]
+[Inherits<UserFileEvent>(0x9C8)]
 [StructLayout(LayoutKind.Explicit, Size = 0xA20)]
 public unsafe partial struct UIInputData {
     public static UIInputData* Instance() => Framework.Instance()->UIModule->GetUIInputData();
@@ -94,8 +100,7 @@ public unsafe partial struct UIInputData {
      */
     //[FieldOffset(0x4F8)] public int IsLastKeyboardKeyDownThrottled;
 
-    [FixedSizeArray<KeyStateFlags>(159)]
-    [FieldOffset(0x4FC)] public fixed byte KeyState[0x4 * 159];
+    [FieldOffset(0x4FC), FixedSizeArray] internal FixedSizeArray159<KeyStateFlags> _keyState;
 
     //[FieldOffset(0x77C)] public byte UnkFlag;
     [FieldOffset(0x77D)] public byte KeyHeldKeycode;
@@ -108,7 +113,7 @@ public unsafe partial struct UIInputData {
     [FieldOffset(0x780)] public byte LastKeyCharKeyCode; // (key code of the character just below, ie `97` for a lowercase `a`)
     [FieldOffset(0x788)] public char LastKeyChar; // (actual character made by key combination, ie `a` or `A`)
 
-    public KeyStateFlags GetKeyState(int key) => KeyStateSpan[key];
+    public KeyStateFlags GetKeyState(int key) => KeyState[key];
     public KeyStateFlags GetKeyState(SeVirtualKey key) => GetKeyState((int)key);
 
     public bool IsKeyPressed(SeVirtualKey key) => IsKeyPressed((int)key);

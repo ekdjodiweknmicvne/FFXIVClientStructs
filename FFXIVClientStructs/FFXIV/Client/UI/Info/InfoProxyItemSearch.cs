@@ -3,11 +3,15 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Info;
 
+// Client::UI::Info::InfoProxyItemSearch
+//   Client::UI::Info::InfoProxyPageInterface
+//     Client::UI::Info::InfoProxyInterface
 [InfoProxy(InfoProxyId.ItemSearch)]
+[GenerateInterop]
+[Inherits<InfoProxyPageInterface>]
+[VirtualTable("48 8D 05 ?? ?? ?? ?? 48 8B F1 48 89 01 48 8D 99 ?? ?? ?? ?? BF ?? ?? ?? ?? 0F 1F 84 00 ?? ?? ?? ?? 48 83 EB 78 48 8B CB E8 ?? ?? ?? ?? 48 83 EF 01 75 EE 8D 5F 14", 3)]
 [StructLayout(LayoutKind.Explicit, Size = 0x5B98)]
-[VTableAddress("48 8D 05 ?? ?? ?? ?? 48 8B F1 48 89 01 48 8D 99 ?? ?? ?? ?? BF ?? ?? ?? ?? 0F 1F 84 00 ?? ?? ?? ?? 48 83 EB 78 48 8B CB E8 ?? ?? ?? ?? 48 83 EF 01 75 EE 8D 5F 14", 3)]
 public unsafe partial struct InfoProxyItemSearch {
-    [FieldOffset(0x00)] public InfoProxyPageInterface InfoProxyPageInterface;
 
     /// <summary>
     /// The ItemID that has been searched.
@@ -19,31 +23,24 @@ public unsafe partial struct InfoProxyItemSearch {
     // [FieldOffset(0x25)] public byte Unk_0x25; // ?
     // [FieldOffset(0x28)] public byte Unk_0x28;
 
-    [FieldOffset(0x30)] private fixed byte InternalListings[MarketBoardListing.Size * 100];
-
     /// <summary>
     /// All items currently available on the general marketboard for the last specified search term (found in <see cref="SearchItemId"/>.
     /// Can be empty if no results were found.
     /// </summary>
-    public Span<MarketBoardListing> Listings => new(Unsafe.AsPointer(ref this.InternalListings[0]), (int)this.ListingCount);
+    [FieldOffset(0x30), FixedSizeArray] internal FixedSizeArray100<MarketBoardListing> _listings;
 
     [FieldOffset(0x4810)] public uint ListingCount;
-
-    [FieldOffset(0x4818)] private fixed byte InternalRetainerListings[MarketBoardListing.Size * 20];
 
     /// <summary>
     /// All items currently available for sale from the last targeted retainer. Can be empty if no results were found.
     /// </summary>
-    public Span<MarketBoardListing> RetainerListings =>
-        new(Unsafe.AsPointer(ref this.InternalRetainerListings[0]), (int)this.RetainerListingCount);
-
-    [FieldOffset(0x56A8)] private fixed byte InternalPlayerRetainers[PlayerRetainerInfo.Size * 10];
+    [FieldOffset(0x4818), FixedSizeArray] internal FixedSizeArray20<MarketBoardListing> _retainerListings;
 
     /// <summary>
     /// All retainers currently registered to the player. Needs to be loaded by accessing any retainer's marketboard listings and appears
     /// to be a cache of some sort.
     /// </summary>
-    public Span<PlayerRetainerInfo> PlayerRetainers => new(Unsafe.AsPointer(ref this.InternalPlayerRetainers[0]), (int)this.PlayerRetainerCount);
+    [FieldOffset(0x56A8), FixedSizeArray] internal FixedSizeArray10<PlayerRetainerInfo> _playerRetainers;
 
     [FieldOffset(0x5B58)] public uint PlayerRetainerCount;
 
@@ -51,53 +48,10 @@ public unsafe partial struct InfoProxyItemSearch {
 
     [FieldOffset(0x5680)] public LastPurchasedMarketboardItem LastPurchasedMarketboardItem;
 
-    [FieldOffset(0x5B68)] public fixed uint WishlistItems[10];
+    [FieldOffset(0x5B68), FixedSizeArray] internal FixedSizeArray10<uint> _wishlistItems;
     [FieldOffset(0x5B90)] public uint WishlistSize;
 
     // [FieldOffset(0x5B96)] public byte Unk_0x5B96; // controls if AddData gets called? (ResultsPresent?)
-
-    /// <summary>
-    /// Loads received marketboard data into the <see cref="Listings"/> array. This method is directly responsible for translating the inbound
-    /// <c>MarketBoardOfferings</c> packet into <see cref="MarketBoardListing"/> structs.
-    /// </summary>
-    /// <param name="packetPtr">A pointer to the packet to load in.</param>
-    /// <param name="count">The number of entries to load. Always appears to be 10.</param>
-    /// <returns>Returns an nint, probably.</returns>
-    [VirtualFunction(1)]
-    public partial nint AddData(nint packetPtr, uint count = 10);
-
-    [VirtualFunction(2)]
-    public partial void RemoveData(); // nullsub. including for completeless only.
-
-    /// <summary>
-    /// Sets the value of <see cref="InfoProxyInterface.EntryCount"/> to 0 for this proxy. Does not actually delete any data from any arrays. 
-    /// </summary>
-    [VirtualFunction(3)]
-    public partial void ClearData();
-
-    /// <summary>
-    /// Send a search request to the server based on the currently selected <see cref="SearchItemId"/> and other data. WILL generate a network request.
-    /// </summary>
-    /// <returns>Returns true if the packet was sent (?), false otherwise.</returns>
-    [VirtualFunction(5)]
-    public partial bool RequestData();
-
-    /// <summary>
-    /// (Currently) a nullsub that gets called by <see cref="AddPage"/> after all data is received from the server.
-    /// </summary>
-    /// <remarks>
-    /// Technically returns <c>0</c>, but the return does not seem to be used at all.
-    /// </remarks>
-    [VirtualFunction(6)]
-    public partial void EndRequest();
-
-    /// <summary>
-    /// Handles the <c>MarketBoardOfferings</c> packet and calls <see cref="AddData"/> to load into the InfoProxy. Will also handle dispatching
-    /// packets to the server for pagination/fetch purposes. Calls <see cref="EndRequest"/> when all data is loaded.
-    /// </summary>
-    /// <param name="packetPtr">A pointer to the packet data to load in.</param>
-    [VirtualFunction(12)]
-    public partial void AddPage(nint packetPtr);
 
     [MemberFunction("41 83 F8 14 77 3C")]
     public partial void ProcessItemHistory(nint a2, nint a3, nint a4);
@@ -152,7 +106,7 @@ public unsafe struct MarketBoardListing {
     /// <summary>
     /// List of materias associated with this item. Only valid up to the count specified in MateriaCount.
     /// </summary>
-    [FieldOffset(0x9E)] public fixed ushort Materia[5];
+    [FieldOffset(0x9E), FixedSizeArray] internal FixedSizeArray5<ushort> _materia;
 
     [FieldOffset(0xA8)] public bool IsHqItem;
     [FieldOffset(0xA9)] public byte MateriaCount;

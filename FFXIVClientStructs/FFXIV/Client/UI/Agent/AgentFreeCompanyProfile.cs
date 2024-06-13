@@ -1,19 +1,22 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentFreeCompanyProfile
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.FreeCompanyProfile)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x27C)]
 public unsafe partial struct AgentFreeCompanyProfile {
-    [FieldOffset(0x000)] public AgentInterface AgentInterface;
     //First = 0xe0 00 00 00 00 00 00 00
     //Next were the same as AgentINspect GuildStruct 0x08
     //These (in Decimal) are the same as used on the Lodestone
-    [FieldOffset(0x028)] public long RequestID;
-    [FieldOffset(0x030)] public long UnkID2;
-    [FieldOffset(0x038)] public long UnkID3;
-    [FieldOffset(0x040)] public long UnkID4;
+    [FieldOffset(0x028)] public long RequestId;
+    [FieldOffset(0x030)] public long UnkId2;
+    [FieldOffset(0x038)] public long UnkId3;
+    [FieldOffset(0x040)] public long UnkId4;
     [FieldOffset(0x048)] public CrestData Crest;
     //Estate Data
     [FieldOffset(0x050)] public ushort PlotNumber; //Starts at 0 (+1 in UI) Only last 6 bits are valid
@@ -21,7 +24,7 @@ public unsafe partial struct AgentFreeCompanyProfile {
     [FieldOffset(0x054)] public ushort EstateZone;
     [FieldOffset(0x056)] public ushort World;
     //4 byte unknown Set to 0xe0000000 in ctor
-    [FieldOffset(0x05C)] public uint FoundationDate; //UNIX Timestamp
+    [FieldOffset(0x05C)] public int FoundationDate; //UNIX Timestamp
     [FieldOffset(0x060)] public short MemberCount;
     [FieldOffset(0x062)] public short MembersOnline;
     [FieldOffset(0x064)] public FCProfile Profile;
@@ -35,10 +38,10 @@ public unsafe partial struct AgentFreeCompanyProfile {
     [FieldOffset(0x1A8)] public Utf8String Slogan;
     [FieldOffset(0x210)] public Utf8String EstateName;
     //4 Status bytes
-    [FieldOffset(0x278)] public byte Unk278;
-    [FieldOffset(0x279)] public byte Unk279;
-    [FieldOffset(0x27A)] public byte Unk27A;
-    [FieldOffset(0x27B)] public byte Unk27B;
+    //[FieldOffset(0x278)] public byte Unk278;
+    //[FieldOffset(0x279)] public byte Unk279;
+    //[FieldOffset(0x27A)] public byte Unk27A;
+    //[FieldOffset(0x27B)] public byte Unk27B;
 
     [StructLayout(LayoutKind.Explicit, Size = 0x6)]
     public struct FCProfile {
@@ -51,8 +54,8 @@ public unsafe partial struct AgentFreeCompanyProfile {
         public enum SeekingType : ushort {
             None = 0,
             Tank = 1,
-            HEaler = 2,
-            DPS = 4,
+            Healer = 2,
+            Dps = 4,
             Crafter = 8,
             Gatherer = 16,
         }

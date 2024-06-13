@@ -1,25 +1,28 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentAozContentBriefing
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.AozContentBriefing)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x1A0)]
 public unsafe partial struct AgentAozContentBriefing {
-    [FieldOffset(0x00)] public AgentInterface AgentInterface;
     [FieldOffset(0x28)] public AozContentData* AozContentData;
     [FieldOffset(0x30)] public Utf8String WeeklyNoviceTitle;
     [FieldOffset(0x98)] public Utf8String WeeklyModerateTitle;
     [FieldOffset(0x100)] public Utf8String WeeklyAdvancedTitle;
     [FieldOffset(0x168)] public AozWeeklyFlags WeeklyCompletion;
-    [FieldOffset(0x169)] public fixed byte WeeklyAozContentId[3];
-    [FieldOffset(0x16C)] public fixed byte NoviceRequirement[3];
-    [FieldOffset(0x16F)] public fixed byte ModerateRequirement[3];
-    [FieldOffset(0x172)] public fixed byte AdvancedRequirement[3];
-    [FieldOffset(0x175)] private fixed byte _UnkBytes[3];
-    [FieldOffset(0x178)] public byte* NoviceRequirements;
-    [FieldOffset(0x180)] public byte* ModerateRequirements;
-    [FieldOffset(0x188)] public byte* AdvancedRequirements;
+    [FieldOffset(0x169), FixedSizeArray] internal FixedSizeArray3<byte> _weeklyAozContentIds;
+    [FieldOffset(0x16C), FixedSizeArray] internal FixedSizeArray3<byte> _noviceRequirements;
+    [FieldOffset(0x16F), FixedSizeArray] internal FixedSizeArray3<byte> _moderateRequirements;
+    [FieldOffset(0x172), FixedSizeArray] internal FixedSizeArray3<byte> _advancedRequirements;
+    [FieldOffset(0x175), FixedSizeArray] internal FixedSizeArray3<byte> _unkBytes;
+    [FieldOffset(0x178)] public byte* NoviceRequirementsPtr;
+    [FieldOffset(0x180)] public byte* ModerateRequirementsPtr;
+    [FieldOffset(0x188)] public byte* AdvancedRequirementsPtr;
     [FieldOffset(0x190)] private byte _UnkFlags;
 
     [MemberFunction("4C 8B C1 80 FA 03")]
@@ -28,6 +31,7 @@ public unsafe partial struct AgentAozContentBriefing {
     public bool IsWeeklyChallengeComplete(AozWeeklyChallenge challenge) => IsWeeklyChallengeComplete((byte)challenge);
 }
 
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x380)]
 public unsafe partial struct AozContentData {
     [FieldOffset(0x04)] private int _UnkLoadState;
@@ -39,21 +43,13 @@ public unsafe partial struct AozContentData {
     [FieldOffset(0x48)] public byte CurrentActIndex;
     [FieldOffset(0x49)] public byte CurrentEnemyIndex;
 
-    [FixedSizeArray<AozArrangementData>(3)]
-    [FieldOffset(0x4A)] public fixed byte Arrangements[3 * 0x7A]; // 3 * AozArrangementData
-    [FieldOffset(0x4A), Obsolete("Use ArrangementsSpan[0]")] public AozArrangementData Act1Arrangement;
-    [FieldOffset(0xC4), Obsolete("Use ArrangementsSpan[1]")] public AozArrangementData Act2Arrangement;
-    [FieldOffset(0x13E), Obsolete("Use ArrangementsSpan[2]")] public AozArrangementData Act3Arrangement;
+    [FieldOffset(0x4A), FixedSizeArray] internal FixedSizeArray3<AozArrangementData> _arrangements;
 
     [FieldOffset(0x228)] public Utf8String NoviceString;
     [FieldOffset(0x290)] public Utf8String ModerateString;
     [FieldOffset(0x2F8)] public Utf8String AdvancedString;
 
-    [FixedSizeArray<AozWeeklyReward>(3)]
-    [FieldOffset(0x360)] public fixed byte WeeklyRewards[3 * 0x8]; // 3 * AozContentRewards
-    [FieldOffset(0x360), Obsolete("Use WeeklyRewardsSpan[0]")] public AozWeeklyReward NoviceRewards;
-    [FieldOffset(0x368), Obsolete("Use WeeklyRewardsSpan[1]")] public AozWeeklyReward ModerateRewards;
-    [FieldOffset(0x370), Obsolete("Use WeeklyRewardsSpan[2]")] public AozWeeklyReward AdvancedRewards;
+    [FieldOffset(0x360), FixedSizeArray] internal FixedSizeArray3<AozWeeklyReward> _weeklyRewards;
 
     [FieldOffset(0x37C)] private float _UnkFloat;
 }
@@ -61,8 +57,8 @@ public unsafe partial struct AozContentData {
 [StructLayout(LayoutKind.Explicit, Size = 0x7A)]
 public unsafe struct AozArrangementData {
     [FieldOffset(0x01)] public byte Count;
-    [FieldOffset(0x02)] public fixed ushort Enemies[30];
-    [FieldOffset(0x3E)] public fixed ushort Positions[30];
+    [FieldOffset(0x02), FixedSizeArray] internal FixedSizeArray30<ushort> _enemies;
+    [FieldOffset(0x3E), FixedSizeArray] internal FixedSizeArray30<ushort> _positions;
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0x08)]

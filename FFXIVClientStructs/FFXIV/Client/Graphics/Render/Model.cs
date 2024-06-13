@@ -2,9 +2,13 @@ using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 
 namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 
+// Client::Graphics::Render::Model
+//   Client::Graphics::Render::RenderObject
+//     Client::Graphics::ReferencedClassBase
+[GenerateInterop]
+[Inherits<ReferencedClassBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0xF0)]
-public unsafe struct Model {
-    [FieldOffset(0x00)] public ReferencedClassBase ReferencedClassBase;
+public unsafe partial struct Model {
     [FieldOffset(0x18)] public Model* Previous;
     [FieldOffset(0x20)] public Model* Next;
 
@@ -23,6 +27,6 @@ public unsafe struct Model {
 
     [FieldOffset(0xE8)] public uint SlotIndex;
 
-    public readonly ReadOnlySpan<Pointer<Material>> MaterialsSpan
+    public ReadOnlySpan<Pointer<Material>> MaterialsSpan
         => new(Materials, MaterialCount);
 }

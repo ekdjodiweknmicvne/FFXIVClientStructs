@@ -2,13 +2,15 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
 
+// Client::UI::AddonReconstructionBox
+//   Component::GUI::AtkUnitBase
+//     Component::GUI::AtkEventListener
 [Addon("ReconstructionBox")]
+[GenerateInterop]
+[Inherits<AtkUnitBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0x440)]
 public unsafe partial struct AddonReconstructionBox {
-    [FieldOffset(0x00)] public AtkUnitBase AtkUnitBase;
-
-    [FixedSizeArray<AddonItemDonationInfo>(10)]
-    [FieldOffset(0x258)] public fixed byte DonationInfoArray[0x30 * 10];
+    [FieldOffset(0x258), FixedSizeArray] internal FixedSizeArray10<AddonItemDonationInfo> _donationInfos;
 
     [FieldOffset(0x438)] public int ItemHovered; // 1 if hovering an item, 0 otherwise
 }

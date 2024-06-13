@@ -1,13 +1,16 @@
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentSalvage
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.Salvage)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x3D0)]
 public unsafe partial struct AgentSalvage {
-    [FieldOffset(0x00)] public AgentInterface AgentInterface;
 
     [FieldOffset(0x30)] public SalvageItemCategory SelectedCategory;
     [FieldOffset(0x38)] public SalvageListItem* ItemList;
@@ -26,14 +29,13 @@ public unsafe partial struct AgentSalvage {
     [FieldOffset(0x398)] public SalvageResult DesynthItem;
     [FieldOffset(0x3A4)] public uint DesynthItemId;
 
-    [FixedSizeArray<SalvageResult>(3)]
-    [FieldOffset(0x3A8)] public fixed byte DesynthResults[8 * 3];
+    [FieldOffset(0x3A8), FixedSizeArray] internal FixedSizeArray3<SalvageResult> _desynthResults;
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B 7C 24 ?? C7 85")]
-    public partial void* ItemListRefresh();
+    public partial void ItemListRefresh();
 
     [MemberFunction("E8 ?? ?? ?? ?? 41 81 BD ?? ?? ?? ?? ?? ?? ?? ?? 7D 1A")]
-    public partial void* ItemListAdd(bool meetsLevelRequirement, InventoryType containerId, int containerSlot, uint itemId, void* exdRow, uint quantity);
+    public partial void ItemListAdd(bool meetsLevelRequirement, InventoryType containerId, int containerSlot, uint itemId, void* exdRow, uint quantity);
 
     public enum SalvageItemCategory {
         InventoryEquipment,

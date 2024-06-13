@@ -1,16 +1,14 @@
 namespace FFXIVClientStructs.FFXIV.Component.SteamApi;
 
-[StructLayout(LayoutKind.Explicit, Size = Size)]
+[GenerateInterop(isInherited: true)]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
 public unsafe partial struct SteamCallbackBase {
-    public const int Size = 0x10;
-
     [Flags]
     public enum SteamCallbackFlags : byte {
         Registered = 1 << 0,
         GameServer = 1 << 1,  // unused
     }
 
-    [FieldOffset(0x0), CExportIgnore] public void** vtbl;
     [FieldOffset(0x8)] public SteamCallbackFlags Flags;
     [FieldOffset(0xC)] public int CallbackId;
 

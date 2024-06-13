@@ -1,6 +1,7 @@
-namespace FFXIVClientStructs.Havok;
+namespace FFXIVClientStructs.Havok.Common.Base.Math.Vector;
 
-[StructLayout(LayoutKind.Sequential)]
-public unsafe struct hkSimdFloat32 {
-    public fixed float f32[4];
+[GenerateInterop]
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public unsafe partial struct hkSimdFloat32 {
+    [FieldOffset(0x00), FixedSizeArray] internal FixedSizeArray4<float> _f32;
 }

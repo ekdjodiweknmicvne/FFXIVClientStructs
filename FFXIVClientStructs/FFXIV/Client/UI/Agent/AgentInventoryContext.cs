@@ -4,21 +4,22 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentInventoryContext
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.InventoryContext)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x778)]
 public unsafe partial struct AgentInventoryContext {
-    [FieldOffset(0x0)] public AgentInterface AgentInterface;
     [FieldOffset(0x28)] public uint BlockingAddonId;
     [FieldOffset(0x2C)] public int ContexItemStartIndex;
     [FieldOffset(0x30)] public int ContextItemCount;
 
-    [FieldOffset(0x38)] public fixed byte EventParams[0x10 * 98];
-    [FieldOffset(0x658)] public fixed byte EventIdArray[84];
+    [FieldOffset(0x38), FixedSizeArray] internal FixedSizeArray98<AtkValue> _eventParams;
+    [FieldOffset(0x658), FixedSizeArray] internal FixedSizeArray84<byte> _eventIds;
     [FieldOffset(0x6AC)] public uint ContextItemDisabledMask;
     [FieldOffset(0x6B0)] public uint ContextItemSubmenuMask;
-
-    public Span<AtkValue> EventParamsSpan => new(Unsafe.AsPointer(ref EventParams[0]), 98);
-    public Span<byte> EventIdSpan => new(Unsafe.AsPointer(ref EventIdArray[0]), 84);
 
     [FieldOffset(0x6B4)] public int PositionX;
     [FieldOffset(0x6B8)] public int PositionY;

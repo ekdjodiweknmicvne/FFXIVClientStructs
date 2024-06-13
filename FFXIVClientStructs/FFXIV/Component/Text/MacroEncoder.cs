@@ -2,6 +2,7 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 
 namespace FFXIVClientStructs.FFXIV.Component.Text;
 
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x310)]
 public unsafe partial struct MacroEncoder {
     [FieldOffset(0x08)] public StdMap<Utf8String, MacroCodeDescription> MacroCodeMap;
@@ -16,36 +17,33 @@ public unsafe partial struct MacroEncoder {
     [FieldOffset(0x2A8)] public Utf8String Str7;
 
     public MacroCodeDescription* GetMacroCode(string code) {
-        var currentNode = MacroCodeMap.SmallestValue;
-        while (currentNode != null && currentNode != MacroCodeMap.Head) {
-            if (currentNode->KeyValuePair.Item1.EqualsString(code))
-                return &currentNode->KeyValuePair.Item2;
-            currentNode = currentNode->Next();
-        }
-        return null;
+        using var us = new Utf8String();
+        us.Ctor();
+        us.SetString(code);
+        return MacroCodeMap.TryGetValuePointer(us, out var ptr) ? ptr : null;
     }
 
     public string? GetMacroString(byte code) {
-        var currentNode = MacroCodeMap.SmallestValue;
-        while (currentNode != null && currentNode != MacroCodeMap.Head) {
-            if (currentNode->KeyValuePair.Item2.Id == code)
-                return currentNode->KeyValuePair.Item1.ToString();
-            currentNode = currentNode->Next();
+        foreach (ref var node in MacroCodeMap) {
+            if (node.Item2.Id == code)
+                return node.Item1.ToString();
         }
+
         return null;
     }
 
     [MemberFunction("E8 ?? ?? ?? ?? FF CF 89 7C 24 ?? EB")]
     public partial int EncodeParameter(Utf8String* output, Utf8String* param, byte type, int* outExtraParams);
 
-    [MemberFunction("E8 ?? ?? ?? ?? 8B F8 83 F8 ?? 0F 8C"), GenerateCStrOverloads]
+    [MemberFunction("E8 ?? ?? ?? ?? 8B F8 83 F8 ?? 0F 8C"), GenerateStringOverloads]
     public partial int EncodeMacro(Utf8String* output, byte* input, int* outNumCharsRead);
 
-    [MemberFunction("E8 ?? ?? ?? ?? 8B D8 83 F8 ?? 7C ?? 49 8D 8E"), GenerateCStrOverloads]
+    [MemberFunction("E8 ?? ?? ?? ?? 8B D8 83 F8 ?? 7C ?? 49 8D 8E"), GenerateStringOverloads]
     public partial void EncodeString(Utf8String* output, byte* input);
 
+    [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = 0x50)]
-    public struct MacroCodeDescription {
+    public partial struct MacroCodeDescription {
         [FieldOffset(0x00)] public byte Id;
         /* 
          * n N = numeric
@@ -54,7 +52,7 @@ public unsafe partial struct MacroEncoder {
          *   . = can be anything, will auto-detect if its a string/number/conditional etc
          *   * = repeat last param type (if param before * was string this needs to be a string too etc.)
          */
-        [FieldOffset(0x01)] public fixed byte ParamTypes[7];
+        [FieldOffset(0x01), FixedSizeArray] internal FixedSizeArray7<byte> _paramTypes;
 
         [FieldOffset(0x44)] public int TotalParamCount;
         [FieldOffset(0x48)] public int ParamCount;

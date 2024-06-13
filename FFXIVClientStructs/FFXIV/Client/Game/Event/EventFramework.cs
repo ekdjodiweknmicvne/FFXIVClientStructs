@@ -5,6 +5,7 @@ namespace FFXIVClientStructs.FFXIV.Client.Game.Event;
 
 // Client::Game::Event::EventFramework
 // ctor "E8 ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? 48 83 C4 28 E9"
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x3C10)]
 public unsafe partial struct EventFramework {
     [FieldOffset(0x00)] public EventHandlerModule EventHandlerModule;
@@ -38,6 +39,12 @@ public unsafe partial struct EventFramework {
     [MemberFunction("E8 ?? ?? ?? ?? 8B D8 3B 86")]
     public static partial uint GetCurrentContentId();
 
+    [MemberFunction("E8 ?? ?? ?? ?? 41 38 44 24")]
+    public static partial ContentType GetCurrentContentType();
+
+    [MemberFunction("E8 ?? ?? ?? ?? 3B C7 75 53")]
+    public static partial ushort GetContentFinderCondition(ContentType contentType, uint contentId);
+
     [MemberFunction("E8 ?? ?? ?? ?? 84 C0 74 18 48 8B 4F 10")]
     public static partial bool CanLeaveCurrentContent();
 
@@ -56,4 +63,12 @@ public unsafe partial struct EventFramework {
 
     public CraftEventHandler* GetCraftEventHandler()
         => (CraftEventHandler*)GetEventHandlerById(0xA0001);
+}
+
+public enum ContentType : byte {
+    None, // used for raids
+    Instance,
+    Party, // SkyIsland - used in early phases of the Diadem
+    Public,
+    GoldSaucer
 }

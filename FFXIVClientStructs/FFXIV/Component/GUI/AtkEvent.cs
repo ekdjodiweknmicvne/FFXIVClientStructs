@@ -31,15 +31,14 @@ public enum AtkEventType : byte {
     DragDropDiscard = 54, // sent when dropping an icon into empty screenspace, eg to remove an action from a hotbar
     DragDropCancel = 55, // sent on MouseUp if the cursor has not moved since DragDropBegin, OR on MouseDown over a locked icon
 
-    [Obsolete("Use AtkEventType.DragDropDiscard instead")]
-    DragDropUnk54 = 54,
-    [Obsolete("Use AtkEventType.DragDropCancel instead")]
-    DragDropUnk55 = 55,
-
     // AtkComponentIconText
     IconTextRollOver = 56,
     IconTextRollOut = 57,
     IconTextClick = 58,
+
+    // AtkDialogue
+    UnkAtkDialogue59 = 59, // found in "40 53 48 83 EC 40 80 79 34 00"
+    UnkAtkDialogue60 = 60,
 
     // AtkTimer
     TimerTick = 61,
@@ -63,6 +62,7 @@ public enum AtkEventType : byte {
     LinkMouseOut = 74,
 }
 
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x30)]
 public unsafe partial struct AtkEvent {
     [FieldOffset(0x0)] public AtkResNode* Node; // extra node param, unused a lot

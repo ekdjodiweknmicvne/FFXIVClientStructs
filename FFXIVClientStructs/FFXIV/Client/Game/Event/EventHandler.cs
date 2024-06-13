@@ -5,6 +5,7 @@ namespace FFXIVClientStructs.FFXIV.Client.Game.Event;
 
 // Client::Game::Event::EventHandler
 // ctor "E8 ?? ?? ?? ?? 45 33 D2 48 8D 05"
+[GenerateInterop(isInherited: true)]
 [StructLayout(LayoutKind.Explicit, Size = 0x210)]
 public unsafe partial struct EventHandler {
     [FieldOffset(0x08)] public StdSet<Pointer<GameObject>> EventObjects;
@@ -15,17 +16,14 @@ public unsafe partial struct EventHandler {
     [FieldOffset(0xC8)] public Utf8String UnkString0;
     [FieldOffset(0x168)] public Utf8String UnkString1;
 
-    /// <remarks> You need to pass your own Utf8String, so the game can copy the title into it. </remarks>
     [VirtualFunction(197)]
-    public partial void GetTitle(Utf8String* title);
+    public partial void GetTitle(Utf8String* outTitle);
 
-    /// <remarks> You need to pass your own Utf8String, so the game can copy the description into it. </remarks>
     [VirtualFunction(249)]
-    public partial void GetDescription(Utf8String* description);
+    public partial void GetDescription(Utf8String* outDescription);
 
-    /// <remarks> You need to pass your own Utf8String, so the game can copy the relief text into it. </remarks>
     [VirtualFunction(250)]
-    public partial void GetReliefText(Utf8String* reliefText);
+    public partial void GetReliefText(Utf8String* outReliefText);
 
     [VirtualFunction(251)]
     public partial int GetTimeRemaining(int currentTimestamp);
@@ -65,11 +63,12 @@ public struct EventHandlerObjective {
 public struct EventId {
     [FieldOffset(0x00), CExportIgnore] public uint Id;
     [FieldOffset(0x00)] public ushort EntryId;
-    [FieldOffset(0x02)] public EventHandlerType Type; //TODO: rename to ContentId
+    [FieldOffset(0x02)] public EventHandlerType ContentId;
     public static implicit operator uint(EventId id) => id.Id;
     public static implicit operator EventId(uint id) => new() { Id = id };
 }
 
+// TODO adjust for name change EventId.Type -> EventId.ContentId?
 public enum EventHandlerType : ushort {
     Quest = 0x0001,
     Warp = 0x0002,
@@ -83,8 +82,6 @@ public enum EventHandlerType : ushort {
     CompanyLeveOfficer = 0x000C,
     Array = 0x000D,
     CraftLeveClient = 0x000E,
-    [Obsolete("Use CraftLeveClient")]
-    CraftLeve = 0x000E,
     GimmickAccessor = 0x000F,
     GimmickBill = 0x0010,
     GimmickRect = 0x0011,
@@ -99,8 +96,6 @@ public enum EventHandlerType : ushort {
     Story = 0x001A,
     SpecialShop = 0x001B,
     DeepDungeon = 0x001C,
-    [Obsolete("Use DeepDungeon")]
-    ContentTalk = 0x001C,
     InstanceContentGuide = 0x001D,
     HousingAethernet = 0x001E,
     FcTalk = 0x001F,
@@ -141,7 +136,7 @@ public enum EventHandlerType : ushort {
     TreasureHuntDirector = 0x8009,
     GoldSaucerDirector = 0x800A,
     CompanyCraftDirector = 0x800B,
-    SkyIslandDirector = 0x800C,
+    SkyIslandDirector = 0x800C, // used in early phases of the Diadem
     DpsChallengeDirector = 0x800D,
     FateDirector = 0x801A
 }

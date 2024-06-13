@@ -3,6 +3,9 @@ using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
 
 namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 
+// Client::Graphics::Render::ModelRenderer
+//   Client::Graphics::Render::BaseRenderer
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x228)]
 public unsafe partial struct ModelRenderer {
     [StructLayout(LayoutKind.Explicit, Size = 0x20)]
@@ -24,8 +27,6 @@ public unsafe partial struct ModelRenderer {
         [FieldOffset(0x10)] public ushort* OutFlags;
     }
 
-    [FieldOffset(0)] public void* Vtbl;
-
     /// <summary> <see cref="ShaderPackage.ConstantSamplerUnknown.Id"/> of the g_LightDirection constant buffer (CRC: 0xEF4E7491). </summary>
     [FieldOffset(0x8)] public uint LightDirectionId;
     /// <summary> <see cref="ShaderPackage.ConstantSamplerUnknown.Id"/> of the g_WorldViewMatrix constant buffer (CRC: 0x76BB3DC0). </summary>
@@ -42,11 +43,9 @@ public unsafe partial struct ModelRenderer {
     /// <summary> <see cref="ShaderPackage.ConstantSamplerUnknown.Id"/> of the g_SamplerViewPosition sampler/texture (CRC: 0xBC615663). </summary>
     [FieldOffset(0x20)] public uint SamplerViewPositionId;
 
-    [FixedSizeArray<ShaderSceneKey>(6)]
-    [FieldOffset(0x28)] public fixed byte SceneKeys[6 * ShaderSceneKey.Size];
+    [FieldOffset(0x28), FixedSizeArray] internal FixedSizeArray6<ShaderSceneKey> _sceneKeys;
 
-    [FixedSizeArray<ShaderSubViewKey>(3)]
-    [FieldOffset(0x88)] public fixed byte SubViewKeys[3 * ShaderSubViewKey.Size];
+    [FieldOffset(0x88), FixedSizeArray] internal FixedSizeArray3<ShaderSubViewKey> _subViewKeys;
 
     [FieldOffset(0xB8)] public ShaderCodeResourceHandle* CharacterSelectionModelVS;
     [FieldOffset(0xC0)] public ShaderCodeResourceHandle* CharacterSelectionModelPS;

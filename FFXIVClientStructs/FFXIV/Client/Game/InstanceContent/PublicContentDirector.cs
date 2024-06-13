@@ -8,9 +8,10 @@ namespace FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 //       Client::Game::Event::LuaEventHandler
 //         Client::Game::Event::EventHandler
 // ctor "E8 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? BA ?? ?? ?? ?? 48 89 03 48 8D 8B"
+[GenerateInterop(isInherited: true)]
+[Inherits<ContentDirector>]
 [StructLayout(LayoutKind.Explicit, Size = 0x1090)]
 public unsafe partial struct PublicContentDirector {
-    [FieldOffset(0x00)] public ContentDirector ContentDirector;
     // fields from PublicContent sheet
     [FieldOffset(0xC48)] public uint NameOffset; // quite useless here
     [FieldOffset(0xC4C)] public uint MapIcon;
@@ -31,7 +32,17 @@ public unsafe partial struct PublicContentDirector {
     [FieldOffset(0xC77)] public byte Unknown4;
 
     [MemberFunction("40 53 57 48 83 EC 78 48 8B D9 48 8D 0D")]
-    public static partial nint HandleEnterContentInfoPacket(EnterContentInfo* packet);
+    public static partial nint HandleEnterContentInfoPacket(EnterContentInfoPacket* packet);
+
+    [StructLayout(LayoutKind.Explicit, Size = 0x28)]
+    public partial struct EnterContentInfoPacket {
+        [FieldOffset(0x00)] public byte NotifyType;
+
+        /// <summary>
+        /// The ID of the ContentFinderCondition EXD that has popped.
+        /// </summary>
+        [FieldOffset(0x1C)] public ushort ContentFinderConditionId;
+    }
 }
 
 public enum PublicContentDirectorType : byte {

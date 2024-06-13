@@ -1,26 +1,33 @@
-using FFXIVClientStructs.FFXIV.Component.GUI;
-
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentReadyCheck
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.ReadyCheck)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x3B0)]
 public unsafe partial struct AgentReadyCheck {
-    [FieldOffset(0x00)] public AgentInterface AgentInterface;
 
-    [FixedSizeArray<ReadyCheckEntry>(48)]
-    [FieldOffset(0xB0)] public fixed byte ReadyCheckEntries[16 * 48];
+    [FieldOffset(0xB0), FixedSizeArray] internal FixedSizeArray48<ReadyCheckEntry> _readyCheckEntries;
 
-    [StructLayout(LayoutKind.Explicit, Size = 0x10)]
-    public struct ReadyCheckEntry {
-        [FieldOffset(0x00)] public long ContentID;
-        [FieldOffset(0x08)] public ReadyCheckStatus Status;
-    }
+    [MemberFunction("40 ?? 48 83 ?? ?? 48 8B ?? E8 ?? ?? ?? ?? 48 ?? ?? ?? 33 C0 ?? 89")]
+    public partial void InitiateReadyCheck();
 
-    public enum ReadyCheckStatus : byte {
-        Unknown = 0,
-        AwaitingResponse = 1,
-        Ready = 2,
-        NotReady = 3,
-        MemberNotPresent = 4
-    }
+    [MemberFunction("40 ?? 53 48 ?? ?? ?? ?? 48 81 ?? ?? ?? ?? ?? 48 8B ?? ?? ?? ?? ?? 48 33 ?? ?? 89 ?? ?? ?? 83 ?? ?? ?? 48 8B ?? 75 ?? 48")]
+    public partial void EndReadyCheck();
+}
+
+[StructLayout(LayoutKind.Explicit, Size = 0x10)]
+public struct ReadyCheckEntry {
+    [FieldOffset(0x00)] public ulong ContentId;
+    [FieldOffset(0x08)] public ReadyCheckStatus Status;
+}
+
+public enum ReadyCheckStatus : byte {
+    Unknown = 0,
+    AwaitingResponse = 1,
+    Ready = 2,
+    NotReady = 3,
+    MemberNotPresent = 4
 }

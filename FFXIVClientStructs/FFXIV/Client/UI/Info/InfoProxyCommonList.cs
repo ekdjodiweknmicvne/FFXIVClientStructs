@@ -3,16 +3,16 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Info;
 
+// Client::UI::Info::InfoProxyCommonList
+//   Client::UI::Info::InfoProxyPageInterface
+//     Client::UI::Info::InfoProxyInterface
+[GenerateInterop(isInherited: true)]
+[Inherits<InfoProxyPageInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0xB8)]
 public unsafe partial struct InfoProxyCommonList {
-    [FieldOffset(0x0)] public InfoProxyPageInterface InfoProxyPageInterface;
     [FieldOffset(0x20)] public Utf8String Unk20;
     [FieldOffset(0x88)] public byte NumberArrayIndex;
-    [Obsolete("Renamed to NumberArrayIndex")]
-    [FieldOffset(0x88)] public byte Unk88; //Corresponding ATkModule NumberArrrayIndex
     [FieldOffset(0x89)] public byte StringArrayIndex;
-    [Obsolete("Renamed to StringArrayIndex")]
-    [FieldOffset(0x89)] public byte Unk89; //Corresponding ATkModule StringArrrayIndex
     [FieldOffset(0x8A)] public ushort DataSize;
     [FieldOffset(0x8C)] public ushort DictSize;
     [FieldOffset(0x8E)] public ushort Unk8E; //10 * DataSize
@@ -22,11 +22,11 @@ public unsafe partial struct InfoProxyCommonList {
     [FieldOffset(0xA9)] public DisplayGroup FilterGroup;
     //[FieldOffset(0xAC)] public uint UnkAC; // Some kind of flag mask for OnlineStatus check InfoProxyCommonlist_vf14
 
-    public readonly ReadOnlySpan<CharacterData> CharDataSpan => new(CharData, (int)InfoProxyPageInterface.InfoProxyInterface.EntryCount); // It cant be higher than 200 at this time anyways so this is fine
-    public readonly ReadOnlySpan<CharacterIndex> CharIndexSpan => new(IndexData, (int)InfoProxyPageInterface.InfoProxyInterface.EntryCount); // It cant be higher than 200 at this time anyways so this is fine
+    public ReadOnlySpan<CharacterData> CharDataSpan => new(CharData, (int)InfoProxyPageInterface.InfoProxyInterface.EntryCount); // It cant be higher than 200 at this time anyways so this is fine
+    public ReadOnlySpan<CharacterIndex> CharIndexSpan => new(IndexData, (int)InfoProxyPageInterface.InfoProxyInterface.EntryCount); // It cant be higher than 200 at this time anyways so this is fine
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B D0 48 8B CB E8 ?? ?? ?? ?? 41 C6 46")]
-    public partial ulong GetContentIDForEntry(uint idx);
+    public partial ulong GetContentIdForEntry(uint idx);
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 85 FF 74 55")]
     public partial CharacterData* GetEntry(uint idx);
@@ -34,14 +34,15 @@ public unsafe partial struct InfoProxyCommonList {
     [MemberFunction("E9 ?? ?? ?? ?? 3B 5F 10")]
     public partial CharacterData* GetEntryByContentId(ulong contentId, uint nameCrc32 = 0, byte a4 = 0);
 
-    [MemberFunction("E8 ?? ?? ?? ?? EB 3C 8D 45 EF"), GenerateCStrOverloads]
+    [MemberFunction("E8 ?? ?? ?? ?? EB 3C 8D 45 EF"), GenerateStringOverloads]
     public partial CharacterData* GetEntryByName(byte* characterName, ushort worldId);
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B 13 45 33 C9")]
     public partial void ApplyFilters();
 
+    [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = 0x68)]
-    public struct CharacterData {
+    public partial struct CharacterData {
         [FieldOffset(0x00)] public ulong ContentId;
         [FieldOffset(0x08)] public OnlineStatus State;
         //12 bytes
@@ -66,8 +67,8 @@ public unsafe partial struct InfoProxyCommonList {
         // 1 byte
         [FieldOffset(0x28)] public byte Sex;
         [FieldOffset(0x29)] public byte Job;
-        [FieldOffset(0x2A)] public fixed byte Name[32];
-        [FieldOffset(0x4A)] public fixed byte FCTag[6];
+        [FieldOffset(0x2A), FixedSizeArray(isString: true)] internal FixedSizeArray32<byte> _name;
+        [FieldOffset(0x4A), FixedSizeArray(isString: true)] internal FixedSizeArray6<byte> _FCTag;
         // 8 bytes
         [FieldOffset(0x58)] public CharacterIndex* Index;
 
@@ -118,34 +119,32 @@ public unsafe partial struct InfoProxyCommonList {
             SimilarDuty = 1ul << 42,
             InDuty = 1ul << 43,
             TrialAdventurer = 1ul << 44,
-            [Obsolete("Typo fixed, use TrialAdventurer")]
-            TrailAdventurer = 1ul << 44,
             FreeCompany = 1ul << 45,
             GrandCompany = 1ul << 46,
             Online = 1ul << 47,
         }
 
         public enum Language : byte {
-            JP = 0,
-            EN = 1,
-            DE = 2,
-            FR = 3,
+            Jp = 0,
+            En = 1,
+            De = 2,
+            Fr = 3,
             None = 0xFF
         }
 
         [Flags]
         public enum LanguageMask : byte {
             None = 0,
-            JP = 1,
-            EN = 2,
-            DE = 4,
-            FR = 8,
+            Jp = 1,
+            En = 2,
+            De = 4,
+            Fr = 8,
         }
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 0x20)]
     public struct CharacterIndex {
-        [FieldOffset(0x0)] public ulong ContentID;
+        [FieldOffset(0x0)] public ulong ContentId;
 
         [FieldOffset(0xA)] public ushort HomeWorld;
     }

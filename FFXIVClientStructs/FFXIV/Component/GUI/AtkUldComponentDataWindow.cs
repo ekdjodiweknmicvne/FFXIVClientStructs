@@ -1,9 +1,10 @@
 namespace FFXIVClientStructs.FFXIV.Component.GUI;
 
+[GenerateInterop]
+[Inherits<AtkUldComponentDataBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0x38)]
-public unsafe struct AtkUldComponentDataWindow {
-    [FieldOffset(0x00)] public AtkUldComponentDataBase Base;
-    [FieldOffset(0x0C)] public fixed uint Nodes[8];
+public unsafe partial struct AtkUldComponentDataWindow {
+    [FieldOffset(0x0C), FixedSizeArray] internal FixedSizeArray8<uint> _nodes;
     [FieldOffset(0x2C)] public uint TitleTextId;
     [FieldOffset(0x30)] public uint SubtitleTextId;
     [FieldOffset(0x34)] public byte ShowCloseButton;

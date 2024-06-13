@@ -1,8 +1,9 @@
 namespace FFXIVClientStructs.FFXIV.Client.System.Framework;
 
+// Client::System::Framework::Task
+[GenerateInterop(isInherited: true)]
 [StructLayout(LayoutKind.Explicit, Size = 0x38)]
 public unsafe partial struct Task {
-    [FieldOffset(0x00), CExportIgnore] public void* vtbl;
     [FieldOffset(0x08)] public void* Runner;
     [FieldOffset(0x10)] public Framework* Framework;
     [FieldOffset(0x18)] public void* Func;
@@ -14,4 +15,3 @@ public unsafe partial struct Task {
     [VirtualFunction(1)]
     public partial void Execute(void* userData);
 }
-

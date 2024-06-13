@@ -7,11 +7,12 @@ namespace FFXIVClientStructs.FFXIV.Component.GUI;
 //     Component::GUI::AtkEventTarget
 // common CreateAtkNode function "E8 ?? ?? ?? ?? 48 8B 4C 24 ?? 48 8B 51 08"
 // type 4
+[GenerateInterop]
+[Inherits<AtkResNode>]
 [StructLayout(LayoutKind.Explicit, Size = 0xD0)]
 public unsafe partial struct AtkNineGridNode : ICreatable {
-    [FieldOffset(0x0)] public AtkResNode AtkResNode;
     [FieldOffset(0xB0)] public AtkUldPartsList* PartsList;
-    [FieldOffset(0xB8)] public uint PartID;
+    [FieldOffset(0xB8)] public uint PartId;
     [FieldOffset(0xBC)] public short TopOffset;
     [FieldOffset(0xBE)] public short BottomOffset;
     [FieldOffset(0xC0)] public short LeftOffset;

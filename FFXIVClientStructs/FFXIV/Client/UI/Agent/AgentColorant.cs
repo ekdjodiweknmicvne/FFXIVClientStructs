@@ -1,5 +1,4 @@
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
@@ -7,19 +6,21 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 //   Client::UI::Agent::AgentInterface
 //     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.Colorant)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x3F0)]
 public partial struct AgentColorant {
-    [FieldOffset(0x00)] public AgentInterface AgentInterface;
 
     [FieldOffset(0x108)] public ColorantCharaView CharaView;
 
     // Client::UI::Agent::AgentColorant::ColorantCharaView
     //   Client::UI::Misc::CharaView
+    [GenerateInterop]
+    [Inherits<CharaView>]
     [StructLayout(LayoutKind.Explicit, Size = 0x2D8)]
-    public unsafe struct ColorantCharaView {
-        [FieldOffset(0)] public CharaView Base;
-        [FieldOffset(0x2C8)] public uint Unk2C8; // a3 passed to vf13
-        [FieldOffset(0x2CC)] public uint ObjectID; // of local player
+    public unsafe partial struct ColorantCharaView {
+        //[FieldOffset(0x2C8)] public uint Unk2C8; // a3 passed to vf13
+        [FieldOffset(0x2CC)] public uint EntityId; // of local player
         [FieldOffset(0x2D0)] public bool DoUpdate;
         [FieldOffset(0x2D1)] public bool HideOtherEquipment;
         [FieldOffset(0x2D2)] public bool GearPreview;

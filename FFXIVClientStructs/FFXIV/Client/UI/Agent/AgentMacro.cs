@@ -1,14 +1,17 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using FFXIVClientStructs.FFXIV.Component.Excel;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentMacro
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.Macro)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0xEB18)]
 public unsafe partial struct AgentMacro {
-    [FieldOffset(0x00)] public AgentInterface AgentInterface;
     [FieldOffset(0x28)] public RaptureMacroModule.Macro ClipboardMacro;
     [FieldOffset(0x6B0)] public ExcelSheet* TextCommandParamSheet;
 
@@ -25,7 +28,7 @@ public unsafe partial struct AgentMacro {
     [FieldOffset(0x6C0)] public Utf8String RawMacroString;
     [FieldOffset(0x728)] public Utf8String ParsedMacroString;
     [FieldOffset(0x790)] public int MacroIconCount;
-    [FieldOffset(0x794)] public fixed uint MacroIconArray[250];
+    [FieldOffset(0x794), FixedSizeArray] internal FixedSizeArray250<uint> _macroIcons;
     [FieldOffset(0xB7C)] public uint IconListAddonId;
 
     [FieldOffset(0xB84)] public uint TextCommandListAddonId;
@@ -33,8 +36,7 @@ public unsafe partial struct AgentMacro {
     [FieldOffset(0xBD0)] public StdVector<TextCommandEntry> TextCommands;
     [FieldOffset(0xBE8)] public int FocusedTextCommandIndex;
 
-    [FixedSizeArray<MacroHistoryEvent>(17)]
-    [FieldOffset(0xBF0)] public fixed byte ChangeHistory[17 * 0xD20];
+    [FieldOffset(0xBF0), FixedSizeArray] internal FixedSizeArray17<MacroHistoryEvent> _changeHistory;
     [FieldOffset(0xEB10)] public int CurrentHistoryIndex;
 
     /// <summary>

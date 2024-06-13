@@ -7,14 +7,13 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Misc;
 // Client::UI::Misc::AcquaintanceModule
 //   Client::UI::Misc::UserFileManager::UserFileEvent
 // ctor "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 41 54 41 56 41 57 48 83 EC 20 45 33 E4 48 89 51 10"
-[VTableAddress("48 8D 05 ?? ?? ?? ?? 41 BF ?? ?? ?? ?? 48 89 06", 3)]
+[GenerateInterop]
+[Inherits<UserFileEvent>]
+[VirtualTable("48 8D 05 ?? ?? ?? ?? 41 BF ?? ?? ?? ?? 48 89 06", 3)]
 [StructLayout(LayoutKind.Explicit, Size = 0x10F8)]
 public unsafe partial struct AcquaintanceModule {
-    public static AcquaintanceModule* Instance() => Framework.Instance()->GetUiModule()->GetAcquaintanceModule();
-
-    [FieldOffset(0)] public UserFileEvent UserFileEvent;
-    [FixedSizeArray<Acquaintance>(16)]
-    [FieldOffset(0x40)] public fixed byte TellHistory[0xE0 * 16];
+    public static AcquaintanceModule* Instance() => Framework.Instance()->GetUIModule()->GetAcquaintanceModule();
+    [FieldOffset(0x40), FixedSizeArray] internal FixedSizeArray16<Acquaintance> _tellHistory;
     [FieldOffset(0xE40)] public uint NumTellHistoryEntries;
 
     [StructLayout(LayoutKind.Explicit, Size = 0xE0)]
@@ -26,6 +25,9 @@ public unsafe partial struct AcquaintanceModule {
 
         [FieldOffset(0xD8)] public ulong ContentId;
     }
+
+    [MemberFunction("44 8B 89 ?? ?? ?? ?? 4C 8B C1 45 85 C9")]
+    public partial Acquaintance* GetTellHistory(int index);
 
     [MemberFunction("E8 ?? ?? ?? ?? 49 8B 45 00 49 8B CD FF 50 48")]
     public partial void ClearTellHistory(bool save = true);

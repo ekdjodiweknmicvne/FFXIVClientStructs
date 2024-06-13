@@ -1,11 +1,5 @@
-namespace FFXIVClientStructs.Havok;
+namespace FFXIVClientStructs.Havok.Common.Base.Object;
 
-[StructLayout(LayoutKind.Sequential)]
-public unsafe struct hkBaseObject {
-    public hkBaseObjectVtbl* vfptr;
-
-    public unsafe struct hkBaseObjectVtbl {
-        public void* dtor;
-        public void* __first_virtual_table_function__;
-    }
-}
+[GenerateInterop(isInherited: true)]
+[StructLayout(LayoutKind.Explicit, Size = 0x08)]
+public partial struct hkBaseObject;

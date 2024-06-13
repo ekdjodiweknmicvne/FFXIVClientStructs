@@ -1,7 +1,8 @@
 namespace FFXIVClientStructs.FFXIV.Component.GUI;
 
+[GenerateInterop]
+[Inherits<AtkUldComponentDataBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0x18)]
-public unsafe struct AtkUldComponentDataMultipurpose {
-    [FieldOffset(0x00)] public AtkUldComponentDataBase Base;
-    [FieldOffset(0x0C)] public fixed uint Nodes[3];
+public unsafe partial struct AtkUldComponentDataMultipurpose {
+    [FieldOffset(0x0C), FixedSizeArray] internal FixedSizeArray3<uint> _nodes;
 }

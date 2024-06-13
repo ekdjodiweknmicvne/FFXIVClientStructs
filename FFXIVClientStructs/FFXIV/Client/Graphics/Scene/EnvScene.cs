@@ -1,8 +1,10 @@
 namespace FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 
+// Client::Graphics::Scene::EnvScene
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x790)]
 public unsafe partial struct EnvScene {
-    [FieldOffset(0x2C), FixedSizeArray<byte>(32)] public fixed byte WeatherIds[32];
+    [FieldOffset(0x2C), FixedSizeArray] internal FixedSizeArray32<byte> _weatherIds;
 
-    [FieldOffset(0xB0), FixedSizeArray<EnvSpace>(8)] public fixed byte EnvSpaces[8 * 0xD0];
+    [FieldOffset(0xB0), FixedSizeArray] internal FixedSizeArray8<EnvSpace> _envSpaces;
 }

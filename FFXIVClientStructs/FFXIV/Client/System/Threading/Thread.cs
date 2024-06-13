@@ -1,7 +1,10 @@
 namespace FFXIVClientStructs.FFXIV.Client.System.Threading;
 
+// Client::System::Threading::Thread
+//   Client::System::Common::NonCopyable
+[GenerateInterop(isInherited: true)]
 [StructLayout(LayoutKind.Explicit, Size = 0x28)]
-public unsafe struct Thread {
+public unsafe partial struct Thread {
     [FieldOffset(0x00)] public byte** args;
     [FieldOffset(0x08)] public nint EventHandle;
     [FieldOffset(0x10)] public nint ThreadHandle;

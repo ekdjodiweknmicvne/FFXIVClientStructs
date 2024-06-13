@@ -2,9 +2,10 @@ using System.Numerics;
 
 namespace FFXIVClientStructs.FFXIV.Common.Component.BGCollision.Math;
 
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x30)]
-public unsafe struct Matrix4x3 {
-    [FieldOffset(0x00), CExportIgnore] public fixed float Matrix[12];
+public unsafe partial struct Matrix4x3 {
+    [FieldOffset(0x00), CExportIgnore, FixedSizeArray] internal FixedSizeArray12<float> _matrix;
 
     [FieldOffset(0x00), CExportIgnore] public Vector3 Row0;
     [FieldOffset(0x0C), CExportIgnore] public Vector3 Row1;
@@ -45,6 +46,13 @@ public unsafe struct Matrix4x3 {
         M31 = M31, M32 = M32, M33 = M33, M34 = 0,
         M41 = M41, M42 = M42, M43 = M43, M44 = 1
     };
+
+    public Matrix4x3(Matrix4x4 full) {
+        Row0 = new(full.M11, full.M12, full.M13);
+        Row1 = new(full.M21, full.M22, full.M23);
+        Row2 = new(full.M31, full.M32, full.M33);
+        Row3 = new(full.M41, full.M42, full.M43);
+    }
 
     public Vector3 TransformCoordinate(Vector3 local) => new(
         M11 * local.X + M21 * local.Y + M31 * local.Z + M41,

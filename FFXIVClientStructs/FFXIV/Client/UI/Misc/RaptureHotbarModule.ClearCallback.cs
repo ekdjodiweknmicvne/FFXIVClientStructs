@@ -1,10 +1,9 @@
 namespace FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
 public partial struct RaptureHotbarModule {
+    [GenerateInterop(isInherited: true)]
     [StructLayout(LayoutKind.Explicit, Size = 0x08)]
     public unsafe partial struct ClearCallback {
-        [FieldOffset(0x0), CExportIgnore] public void** vtbl;
-
         [VirtualFunction(0)]
         public partial void Dtor(bool freeMemory);
 
@@ -23,7 +22,7 @@ public partial struct RaptureHotbarModule {
         /// <param name="classJobId">The ClassJobID to reset.</param>
         /// <returns>Returns true.</returns>
         [VirtualFunction(2)]
-        public partial bool ResetPvEHotbarsForClass(RaptureHotbarModule* raptureHotbarModule, int classJobId);
+        public partial bool ResetPvEHotbarsForClass(RaptureHotbarModule* raptureHotbarModule, uint classJobId);
 
         /// <summary>
         /// Resets the PvP hotbars for the specified ClassJobId to their default values.

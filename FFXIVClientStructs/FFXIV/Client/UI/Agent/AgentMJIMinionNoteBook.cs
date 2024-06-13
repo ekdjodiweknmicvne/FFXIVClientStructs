@@ -1,11 +1,13 @@
-using FFXIVClientStructs.FFXIV.Component.GUI;
-
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentMJIMinionNoteBook
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.MJIMinionNoteBook)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x208)]
 public unsafe partial struct AgentMJIMinionNoteBook {
-    [FieldOffset(0)] public AgentInterface AgentInterface;
 
     [FieldOffset(0x1DC)] public SelectedMinionInfo SelectedFavoriteMinion;
     [FieldOffset(0x1E0)] public SelectedMinionInfo SelectedNormalMinion;

@@ -1,8 +1,8 @@
 namespace FFXIVClientStructs.FFXIV.Component.GUI;
 
+[GenerateInterop(isInherited: true)]
 [StructLayout(LayoutKind.Explicit, Size = 0x30)]
 public unsafe partial struct AtkDragDropInterface {
-    [FieldOffset(0x00), CExportIgnore] public void* vtbl;
     [FieldOffset(0x08)] public AtkComponentNode* ComponentNode;
     [FieldOffset(0x10)] public AtkResNode* ActiveNode;
     // [FieldOffset(0x18)] public void* UnkBuffer; // Points to a buffer of 12 bytes? (freed on dtor)

@@ -2,13 +2,13 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
 
+// Client::UI::AddonActionBarBase
+//   Component::GUI::AtkUnitBase
+//     Component::GUI::AtkEventListener
+[GenerateInterop(isInherited: true)]
+[Inherits<AtkUnitBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0x248)]
 public unsafe partial struct AddonActionBarBase {
-    [FieldOffset(0x00)] public AtkUnitBase AtkUnitBase;
-
-    [Obsolete("Use ActionBarSlotVector")]
-    [FieldOffset(0x220)] public ActionBarSlot* ActionBarSlots;
-
     [FieldOffset(0x220)] public StdVector<ActionBarSlot> ActionBarSlotVector;
 
     /// <summary>
@@ -42,9 +42,6 @@ public unsafe partial struct AddonActionBarBase {
     /// <param name="slotIndex">A zero-indexed value of which slot to pulse.</param>
     [VirtualFunction(78)]
     public partial void PulseActionBarSlot(int slotIndex);
-
-    [Obsolete("Use ActionBarSlotVector")]
-    public Span<ActionBarSlot> Slot => new(ActionBarSlots, SlotCount);
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 0xC8)]

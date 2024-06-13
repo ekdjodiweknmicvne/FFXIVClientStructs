@@ -12,9 +12,10 @@ namespace FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 //     Client::Graphics::Scene::DrawObject
 //       Client::Graphics::Scene::Object
 // ctor "E8 ?? ?? ?? ?? 48 8B F8 48 85 C0 74 28 48 8D 55 D7"
+[GenerateInterop]
+[Inherits<CharacterBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0xA80)]
 public unsafe partial struct Human {
-    [FieldOffset(0x0)] public CharacterBase CharacterBase;
     [FieldOffset(0x8F0)] public CustomizeData Customize;
     [FieldOffset(0x90C)] public uint SlotNeedsUpdateBitfield;
     [FieldOffset(0x910)] public EquipmentModelId Head;
@@ -57,9 +58,9 @@ public unsafe partial struct Human {
     [FieldOffset(0x9D8)] public ConstantBuffer* CustomizeParameterCBuffer;
     [FieldOffset(0x9E0)] public ConstantBuffer* DecalColorCBuffer;
 
-    public readonly ConstantBufferPointer<CustomizeParameter> CustomizeParameterTypedCBuffer
+    public ConstantBufferPointer<CustomizeParameter> CustomizeParameterTypedCBuffer
         => new(CustomizeParameterCBuffer);
-    public readonly ConstantBufferPointer<Vector4> DecalColorTypedCBuffer
+    public ConstantBufferPointer<Vector4> DecalColorTypedCBuffer
         => new(DecalColorCBuffer);
 
     [FieldOffset(0x9E8)] public TextureResourceHandle* Decal;

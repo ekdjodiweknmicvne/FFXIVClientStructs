@@ -1,12 +1,16 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.GUI;
+using AtkEventInterface = FFXIVClientStructs.FFXIV.Component.GUI.AtkModuleInterface.AtkEventInterface;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentMJIAnimalManagement
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.MJIAnimalManagement)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x1E0)]
 public unsafe partial struct AgentMJIAnimalManagement {
-    [FieldOffset(0x000)] public AgentInterface AgentInterface;
     // 0x28 struct of size 0xA0 used for reading excel sheets
     // 0xC8 bool[3] pending initialization requests
     [FieldOffset(0x0D0)] public AtkEventInterface* OpHandler; // pointer to some class derived from AtkEventInterface of size 0x30
@@ -47,7 +51,7 @@ public unsafe partial struct AgentMJIAnimalManagement {
     }
     [StructLayout(LayoutKind.Explicit, Size = 0x170)]
     public unsafe partial struct Slot {
-        [FieldOffset(0x000)] public uint ObjectId;
+        [FieldOffset(0x000)] public uint EntityId;
         [FieldOffset(0x008)] public AnimalDesc Desc;
         [FieldOffset(0x088)] public uint FoodItemId;
         [FieldOffset(0x08C)] public uint FoodItemCategoryId;

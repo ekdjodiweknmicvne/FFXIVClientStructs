@@ -4,26 +4,23 @@ using FFXIVClientStructs.FFXIV.Client.System.Memory;
 namespace FFXIVClientStructs.FFXIV.Component.GUI;
 
 // Component::GUI::AtkTexture
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x18)]
 public unsafe partial struct AtkTexture : ICreatable {
-    [FieldOffset(0x0), CExportIgnore] public void* vtbl;
-
     // union type
-    [FieldOffset(0x8), CExporterUnion("Union.Texture")] public AtkTextureResource* Resource;
-    [FieldOffset(0x8), CExporterUnion("Union.Texture")] public void* Crest;
-    [FieldOffset(0x8), CExporterUnion("Union.Texture")] public Texture* KernelTexture;
+    [FieldOffset(0x8), CExporterUnion("Texture")] public AtkTextureResource* Resource;
+    [FieldOffset(0x8), CExporterUnion("Texture")] public void* Crest;
+    [FieldOffset(0x8), CExporterUnion("Texture")] public Texture* KernelTexture;
     [FieldOffset(0x10)] public TextureType TextureType;
-    [FieldOffset(0x11), Obsolete("Use IsTextureReady() instead")] public bool TextureReady;
     [FieldOffset(0x11)] private bool CachedIsTextureReady; // Use IsTextureReady() to get this
 
     [MemberFunction("E8 ?? ?? ?? ?? 48 8B 87 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? 4C 89 BF")]
     public partial void Ctor();
 
     [MemberFunction("E8 ?? ?? ?? ?? 41 8D 84 24 ?? ?? ?? ??")]
-    public partial int LoadIconTexture(int iconId, int version = 1);
+    public partial int LoadIconTexture(uint iconId, int version = 1);
 
-    [GenerateCStrOverloads]
-    [MemberFunction("E8 ?? ?? ?? ?? 4C 8B 6C 24 ?? 4C 8B 5C 24")]
+    [MemberFunction("E8 ?? ?? ?? ?? 4C 8B 6C 24 ?? 4C 8B 5C 24"), GenerateStringOverloads]
     public partial int LoadTexture(byte* path, int version = 1);
 
     [MemberFunction("E8 ?? ?? ?? ?? C6 43 10 02")]

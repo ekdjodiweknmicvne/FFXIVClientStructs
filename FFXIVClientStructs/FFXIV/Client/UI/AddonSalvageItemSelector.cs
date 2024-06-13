@@ -4,14 +4,17 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI;
 
+// Client::UI::AddonSalvageItemSelector
+//   Component::GUI::AtkUnitBase
+//     Component::GUI::AtkEventListener
 [Addon("SalvageItemSelector")]
+[GenerateInterop]
+[Inherits<AtkUnitBase>]
 [StructLayout(LayoutKind.Explicit, Size = 0x1CF8)]
 public unsafe partial struct AddonSalvageItemSelector {
-    [FieldOffset(0x0000)] public AtkUnitBase AtkUnitBase;
     [FieldOffset(0x0228)] public AgentSalvage.SalvageItemCategory SelectedCategory;
 
-    [FixedSizeArray<SalvageItem>(140)]
-    [FieldOffset(0x02B0)] public fixed byte Items[0x30 * 140];
+    [FieldOffset(0x02B0), FixedSizeArray] internal FixedSizeArray140<SalvageItem> _items;
 
     [FieldOffset(0x1CF0)] public uint ItemCount;
 
@@ -22,9 +25,8 @@ public unsafe partial struct AddonSalvageItemSelector {
         [FieldOffset(0x08)] public uint IconId;
         [FieldOffset(0x10)] public byte* NamePtr;
         [FieldOffset(0x18)] public uint Quantity;
-        [FieldOffset(0x1C)] public uint JobIconID;
+        [FieldOffset(0x1C)] public uint JobIconId;
         [FieldOffset(0x20)] public byte* JobNamePtr;
         [FieldOffset(0x28)] public byte Unknown28;
     }
-
 }

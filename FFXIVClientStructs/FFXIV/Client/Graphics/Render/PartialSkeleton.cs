@@ -1,17 +1,18 @@
 using FFXIVClientStructs.FFXIV.Client.System.Resource.Handle;
-using FFXIVClientStructs.Havok;
+using FFXIVClientStructs.Havok.Animation.Playback;
+using FFXIVClientStructs.Havok.Animation.Playback.SampleAndBlend;
+using FFXIVClientStructs.Havok.Animation.Rig;
 
 namespace FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 
+[GenerateInterop]
 [StructLayout(LayoutKind.Explicit, Size = 0x1C0)]
 public unsafe partial struct PartialSkeleton {
-    [FieldOffset(0x0)] public void* vtbl;
-    [FixedSizeArray<hkaSampleBlendJob>(2)]
-    [FieldOffset(0x20)] public fixed byte Jobs[2 * 0x80]; // 2 * hkaSampleBlendJob
+    [FieldOffset(0x20), FixedSizeArray] internal FixedSizeArray2<hkaSampleBlendJob> _jobs;
     [FieldOffset(0x120)] public short ConnectedParentBoneIndex;
     [FieldOffset(0x122)] public short ConnectedBoneIndex;
-    [FieldOffset(0x130)] public fixed ulong HavokAnimatedSkeleton[2];
-    [FieldOffset(0x140)] public fixed ulong HavokPoses[4];
+    [FieldOffset(0x130), FixedSizeArray] internal FixedSizeArray2<ulong> _havokAnimatedSkeletons;
+    [FieldOffset(0x140), FixedSizeArray] internal FixedSizeArray4<ulong> _havokPoses;
     [FieldOffset(0x160)] public Skeleton* Skeleton;
     [FieldOffset(0x180)] public void* SkeletonParameterResourceHandle;
     [FieldOffset(0x188)] public SkeletonResourceHandle* SkeletonResourceHandle;
@@ -19,7 +20,7 @@ public unsafe partial struct PartialSkeleton {
 
     public hkaAnimatedSkeleton* GetHavokAnimatedSkeleton(int index) {
         if (index is < 0 or > 1) throw new ArgumentOutOfRangeException(nameof(index));
-        return (hkaAnimatedSkeleton*)HavokAnimatedSkeleton[index];
+        return (hkaAnimatedSkeleton*)HavokAnimatedSkeletons[index];
     }
 
     public hkaPose* GetHavokPose(int index) {

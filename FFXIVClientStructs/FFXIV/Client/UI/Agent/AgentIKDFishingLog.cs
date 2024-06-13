@@ -1,25 +1,23 @@
-using FFXIVClientStructs.FFXIV.Component.GUI;
-
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentIKDFishingLog
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.IKDFishingLog)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x460)]
 public unsafe partial struct AgentIKDFishingLog {
-    [FieldOffset(0x00)] public AgentInterface AgentInterface;
-
     [FieldOffset(0x28)] public uint RouteId;
-    [FieldOffset(0x2C)] public fixed uint SpotId[3];
+    [FieldOffset(0x2C), FixedSizeArray] internal FixedSizeArray3<uint> _spotIds;
     [FieldOffset(0x38)] public uint SpotIndex;
     [FieldOffset(0x3C)] public uint SelectedSpotIndex; // in the Potential Catch window
     [FieldOffset(0x40)] public uint Points;
     [FieldOffset(0x44)] public bool SpecialCurrent;
 
-    [FixedSizeArray<LogEntry>(3)]
-    [FieldOffset(0x48)] public fixed byte Log[3 * 0x10];
+    [FieldOffset(0x48), FixedSizeArray] internal FixedSizeArray3<LogEntry> _logs;
 
-    [FixedSizeArray<PotentialCatchSpot>(3)]
-    [FieldOffset(0x84)] public fixed byte PotentialCatchSpots[3 * 0x148];
-
+    [FieldOffset(0x84), FixedSizeArray] internal FixedSizeArray3<PotentialCatchSpot> _potentialCatchSpots;
     [FieldOffset(0x45C)] public bool DisplayOnlyCaught;
 
     [StructLayout(LayoutKind.Explicit, Size = 0x10)]
@@ -30,14 +28,13 @@ public unsafe partial struct AgentIKDFishingLog {
         [FieldOffset(0x0C)] public ushort Points;
     }
 
+    [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = 0x148)]
     public unsafe partial struct PotentialCatchSpot {
         [FieldOffset(0x00)] public uint SpotId;
-        [FixedSizeArray<LogEntry>(10)]
-        [FieldOffset(0x04)] public fixed byte CatchEntries[10 * 0x10];
+        [FieldOffset(0x04), FixedSizeArray] internal FixedSizeArray10<LogEntry> _catchEntries;
 
         [FieldOffset(0xA4)] public uint SpecialSpotId;
-        [FixedSizeArray<LogEntry>(10)]
-        [FieldOffset(0xA8)] public fixed byte SpecialCatchEntries[10 * 0x10];
+        [FieldOffset(0xA8), FixedSizeArray] internal FixedSizeArray10<LogEntry> _specialCatchEntries;
     }
 }

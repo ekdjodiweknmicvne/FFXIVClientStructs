@@ -13,8 +13,9 @@ public static class ExporterStatics {
     public static string StdNamespacePrefix = string.Join(".", nameof(FFXIVClientStructs), nameof(FFXIVClientStructs.STD), "");
     public static string InteropNamespacePrefix = string.Join(".", nameof(FFXIVClientStructs), nameof(FFXIVClientStructs.Interop), "");
     public static string HavokNamespacePrefix = string.Join(".", nameof(FFXIVClientStructs), nameof(FFXIVClientStructs.Havok), "");
+    public static BindingFlags BindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
-    public static string[] IgnoredTypeNames = { "MemberFunctionPointers", "StaticAddressPointers", "Addresses", "VTable" };
+    public static string[] IgnoredTypeNames = { "MemberFunctionPointers", "StaticAddressPointers", "Addresses", "VirtualTable" };
     public static List<string> WarningList = [];
     public static List<string> ErrorList = [];
 
@@ -31,7 +32,7 @@ public static class ExporterStatics {
             definedTypes = ex.Types.Where(t => t != null).ToArray()!;
         }
 
-        return definedTypes.Where(t => t.FullName!.StartsWith(FFXIVNamespacePrefix) && !t.FullName.EndsWith("VTable") && t.GetCustomAttribute<CExportIgnoreAttribute>() == null).ToArray();
+        return definedTypes.Where(t => t.FullName!.StartsWith(FFXIVNamespacePrefix) && !t.FullName.EndsWith("VirtualTable") && t.GetCustomAttribute<CExportIgnoreAttribute>() == null).ToArray();
     }
 
     public static Type[] GetHavokTypes() {
@@ -44,7 +45,7 @@ public static class ExporterStatics {
             definedTypes = ex.Types.Where(t => t != null).ToArray()!;
         }
 
-        return definedTypes.Where(t => t.FullName!.StartsWith(HavokNamespacePrefix) && !t.FullName.EndsWith("VTable") && t.GetCustomAttribute<CExportIgnoreAttribute>() == null).ToArray();
+        return definedTypes.Where(t => t.FullName!.StartsWith(HavokNamespacePrefix) && !t.FullName.EndsWith("VirtualTable") && t.GetCustomAttribute<CExportIgnoreAttribute>() == null).ToArray();
     }
 }
 

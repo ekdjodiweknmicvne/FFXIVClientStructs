@@ -1,7 +1,10 @@
-namespace FFXIVClientStructs.Havok;
+using FFXIVClientStructs.Havok.Common.Base.Object;
 
-[StructLayout(LayoutKind.Sequential)]
-public struct hkaSkeletonMapper {
-    public hkReferencedObject hkReferencedObject;
-    public hkaSkeletonMapperData Mapping;
+namespace FFXIVClientStructs.Havok.Animation.Mapper;
+
+[GenerateInterop]
+[Inherits<hkReferencedObject>]
+[StructLayout(LayoutKind.Explicit, Size = 0xB8)]
+public partial struct hkaSkeletonMapper {
+    [FieldOffset(0x10)] public hkaSkeletonMapperData Mapping;
 }

@@ -6,19 +6,18 @@ namespace FFXIVClientStructs.FFXIV.Client.UI.Misc;
 // Client::UI::Misc::RecipeFavoriteModule
 //   Client::UI::Misc::UserFileManager::UserFileEvent
 // ctor "E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? 49 8B D4 E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? 49 8B D4 E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 8F ?? ?? ?? ?? E8"
+[GenerateInterop]
+[Inherits<UserFileEvent>]
 [StructLayout(LayoutKind.Explicit, Size = 0x188)]
 public unsafe partial struct RecipeFavoriteModule {
-    public static RecipeFavoriteModule* Instance() => Framework.Instance()->GetUiModule()->GetRecipeFavoriteModule();
+    public static RecipeFavoriteModule* Instance() => Framework.Instance()->GetUIModule()->GetRecipeFavoriteModule();
 
-    [FieldOffset(0)] public UserFileEvent UserFileEvent;
+    [FieldOffset(0x42), FixedSizeArray] internal FixedSizeArray8<CraftingTypeEntry> _craftingTypes;
 
-    [FixedSizeArray<CraftingTypeEntry>(8)]
-    [FieldOffset(0x42)] public fixed byte CraftingTypes[8 * 10 * 0x4];
-
+    [GenerateInterop]
     [StructLayout(LayoutKind.Explicit, Size = 0x28)]
     public partial struct CraftingTypeEntry {
-        [FixedSizeArray<RecipeEntry>(10)]
-        [FieldOffset(0)] public fixed byte Recipes[10 * 0x4];
+        [FieldOffset(0), FixedSizeArray] internal FixedSizeArray10<RecipeEntry> _recipes;
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 0x4)]
@@ -28,14 +27,14 @@ public unsafe partial struct RecipeFavoriteModule {
     }
 
     [MemberFunction("48 63 C2 45 0F B7 C8")]
-    public partial RecipeEntry* GetEntry(byte craftType, ushort recipeID);
+    public partial RecipeEntry* GetEntry(byte craftType, ushort recipeId);
 
     [MemberFunction("85 D2 78 32 48 63 C2")]
-    public partial bool IsFavorited(byte craftType, ushort recipeID);
+    public partial bool IsFavorited(byte craftType, ushort recipeId);
 
     [MemberFunction("E8 ?? ?? ?? ?? 8B CD 48 8B C5")]
-    public partial uint RemoveFromFavorites(byte craftType, ushort recipeID); // returns LogMessage RowId
+    public partial uint RemoveFromFavorites(byte craftType, ushort recipeId); // returns LogMessage RowId
 
     [MemberFunction("E8 ?? ?? ?? ?? 8B F8 49 8B CE")]
-    public partial uint AddToFavorites(byte craftType, ushort recipeID); // returns LogMessage RowId
+    public partial uint AddToFavorites(byte craftType, ushort recipeId); // returns LogMessage RowId
 }

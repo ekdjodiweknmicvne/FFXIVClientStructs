@@ -1,19 +1,22 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Component.GUI;
+using AtkEventInterface = FFXIVClientStructs.FFXIV.Component.GUI.AtkModuleInterface.AtkEventInterface;
 
 namespace FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
+// Client::UI::Agent::AgentMJIFarmManagement
+//   Client::UI::Agent::AgentInterface
+//     Component::GUI::AtkModuleInterface::AtkEventInterface
 [Agent(AgentId.MJIFarmManagement)]
+[GenerateInterop]
+[Inherits<AgentInterface>]
 [StructLayout(LayoutKind.Explicit, Size = 0x13D8)]
 public unsafe partial struct AgentMJIFarmManagement {
     public const int MaxSlots = 20;
 
-    [FieldOffset(0x0000)] public AgentInterface AgentInterface;
     [FieldOffset(0x0028)] public AtkEventInterface* OpHandler; // pointer to some class derived from AtkEventInterface of size 0x30
     // 0x30..0x40 - a bunch of different addon handles
 
-    [FixedSizeArray<Slot>(MaxSlots)]
-    [FieldOffset(0x0048)] public fixed byte Slots[MaxSlots * 0xF8];
+    [FieldOffset(0x0048), FixedSizeArray] internal FixedSizeArray20<Slot> _slots;
 
     [FieldOffset(0x13A8)] public StdVector<Seed> Seeds;
 
